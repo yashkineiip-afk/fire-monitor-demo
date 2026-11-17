@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мониторинг ПБ — демо</title>
+<style>
+:root {
+  --bg: #f4f2ee;
+  --panel: #ffffff;
+  --ink: #1d1f22;
+  --muted: #6b6f76;
+  --line: #e2ded6;
+  --accent: #b3261e;
+  --accent-ink: #ffffff;
+  --red: #c62828;   --red-bg: #fdecea;
+  --yellow: #a76a00; --yellow-bg: #fff4d6;
+  --green: #2e7d32; --green-bg: #e7f4e8;
+  --gray: #6b6f76;  --gray-bg: #eeece8;
+  --radius: 10px;
+  font-size: 15px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; line-height: 1.45; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 1.6rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+h2 { font-size: 1.15rem; margin: 1.4rem 0 .6rem; }
+h3 { font-size: 1rem; margin: 1rem 0 .4rem; }
+.muted { color: var(--muted); }
+.small { font-size: .86rem; }
+
+/* --- верхняя панель --- */
+.top { background: #1d1f22; color: #fff; }
+.top .wrap { display: flex; align-items: center; gap: 1.2rem; min-height: 56px; flex-wrap: wrap; }
+.brand { font-weight: 700; color: #fff; display: flex; gap: .5rem; align-items: center; font-size: 1.05rem; }
+.brand:hover { text-decoration: none; }
+.brand .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(179,38,30,.3); }
+.nav { display: flex; gap: .2rem; flex-wrap: wrap; flex: 1; }
+.nav a { color: #cfd2d6; padding: .4rem .7rem; border-radius: 6px; }
+.nav a:hover, .nav a.on { background: #2f3236; color: #fff; text-decoration: none; }
+.who { color: #aeb2b8; font-size: .85rem; display: flex; gap: .6rem; align-items: center; }
+.who form { margin: 0; }
+.who button { background: none; border: 1px solid #44484d; color: #cfd2d6; padding: .25rem .6rem; border-radius: 6px; cursor: pointer; }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 1.2rem; }
+main.wrap { padding-top: 1.4rem; padding-bottom: 3rem; }
+.normbar { background: #2a2c30; color: #b9bdc2; font-size: .78rem; }
+.normbar .wrap { padding-top: .35rem; padding-bottom: .35rem; }
+
+/* --- карточки --- */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.2rem; margin-bottom: 1rem; }
+.grid { display: grid; gap: 1rem; }
+.grid.k { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.grid.two { grid-template-columns: 1fr 1fr; }
+@media (max-width: 860px) { .grid.two { grid-template-columns: 1fr; } }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: .9rem 1rem; }
+.kpi .v { font-size: 1.8rem; font-weight: 700; line-height: 1.1; }
+.kpi .l { color: var(--muted); font-size: .82rem; }
+.kpi.red .v { color: var(--red); } .kpi.yellow .v { color: var(--yellow); } .kpi.green .v { color: var(--green); }
+
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.actions { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+
+/* --- таблицы --- */
+.tbl { width: 100%; border-collapse: collapse; background: var(--panel); }
+.tbl th { text-align: left; font-weight: 600; font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em;
+  border-bottom: 1px solid var(--line); padding: .6rem .6rem; }
+.tbl td { border-bottom: 1px solid var(--line); padding: .6rem .6rem; vertical-align: top; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl tr.row-red td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+.tbl tr.row-yellow td:first-child { box-shadow: inset 3px 0 0 #e0a100; }
+.tbl tr.row-green td:first-child { box-shadow: inset 3px 0 0 var(--green); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); margin-bottom: 1rem; }
+
+/* --- метки --- */
+.pill { display: inline-block; padding: .12rem .55rem; border-radius: 99px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.pill.red { background: var(--red-bg); color: var(--red); }
+.pill.yellow { background: var(--yellow-bg); color: var(--yellow); }
+.pill.green { background: var(--green-bg); color: var(--green); }
+.pill.gray { background: var(--gray-bg); color: var(--gray); }
+.tag { display: inline-block; font-size: .75rem; padding: .05rem .45rem; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); }
+.bar { height: 6px; background: var(--gray-bg); border-radius: 99px; overflow: hidden; min-width: 80px; }
+.bar i { display: block; height: 100%; background: var(--green); }
+
+/* --- вкладки объекта --- */
+.tabs { display: flex; gap: .2rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; overflow-x: auto; }
+.tabs a { padding: .55rem .9rem; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a.on { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.tabs a:hover { text-decoration: none; color: var(--ink); }
+.tabs .cnt { font-size: .72rem; background: var(--red-bg); color: var(--red); border-radius: 99px; padding: 0 .4rem; margin-left: .2rem; }
+
+/* --- формы --- */
+label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .25rem; }
+input[type=text], input[type=email], input[type=password], input[type=number], input[type=date], select, textarea {
+  width: 100%; padding: .5rem .6rem; border: 1px solid #cfcac0; border-radius: 7px; font: inherit; background: #fff; color: var(--ink); }
+textarea { min-height: 70px; resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 2px solid rgba(179,38,30,.25); border-color: var(--accent); }
+.field { margin-bottom: .8rem; }
+.field .hint { font-size: .76rem; color: var(--muted); margin-top: .2rem; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 1rem; }
+.check { display: flex; gap: .5rem; align-items: flex-start; color: var(--ink); font-size: .92rem; margin-bottom: .7rem; cursor: pointer; }
+.check input { margin-top: .2rem; width: 17px; height: 17px; accent-color: var(--accent); }
+.btn { display: inline-block; background: var(--accent); color: var(--accent-ink); border: 0; padding: .55rem 1rem; border-radius: 7px;
+  font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+.btn:hover { filter: brightness(1.08); text-decoration: none; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1px solid #cfcac0; }
+.btn.sm { padding: .3rem .65rem; font-size: .85rem; }
+.inline { display: inline; }
+.rowform { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+.rowform input, .rowform select { width: auto; }
+
+.sys { border: 1px solid var(--line); border-radius: 8px; padding: .7rem .9rem; margin-bottom: .6rem; background: #fcfbf9; }
+.sys .check { margin: 0; font-weight: 600; }
+.sys .sysfields { margin-top: .7rem; display: none; }
+.sys.on { border-color: #e8b4ae; background: #fff; }
+.sys.on .sysfields { display: grid; }
+
+/* --- чек-лист --- */
+.cl-item { display: grid; grid-template-columns: 2.4rem 1fr 15rem; gap: .8rem; padding: .8rem .2rem; border-bottom: 1px solid var(--line); }
+.cl-item:last-child { border-bottom: 0; }
+.cl-no { font-weight: 700; color: var(--muted); }
+.cl-ans { display: flex; gap: .3rem; }
+.cl-ans label { margin: 0; flex: 1; text-align: center; border: 1px solid #cfcac0; border-radius: 6px; padding: .3rem 0; cursor: pointer; color: var(--ink); font-size: .85rem; }
+.cl-ans input { display: none; }
+.cl-ans input:checked + span { font-weight: 700; }
+.cl-ans label:has(input[value=yes]:checked) { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.cl-ans label:has(input[value=no]:checked) { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+.cl-ans label:has(input[value=na]:checked) { background: var(--gray-bg); border-color: var(--gray); }
+.cl-extra { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 15rem; gap: .8rem; }
+@media (max-width: 760px) {
+  .cl-item { grid-template-columns: 2rem 1fr; }
+  .cl-ans { grid-column: 2; }
+  .cl-extra { grid-column: 2; grid-template-columns: 1fr; }
+}
+
+/* --- сообщения --- */
+.flash { padding: .7rem 1rem; border-radius: 8px; margin-bottom: .8rem; }
+.flash.ok { background: var(--green-bg); color: #1d5a21; }
+.flash.error { background: var(--red-bg); color: var(--red); }
+.warn { background: var(--yellow-bg); border: 1px solid #f0d58a; color: #6e4800; padding: .6rem .9rem; border-radius: 8px; margin-bottom: .5rem; font-size: .92rem; }
+
+.login { max-width: 400px; margin: 8vh auto; }
+.kv { display: grid; grid-template-columns: minmax(140px, 40%) 1fr; gap: .3rem .8rem; font-size: .93rem; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; }
+details summary { cursor: pointer; color: var(--accent); font-size: .88rem; }
+.empty { color: var(--muted); padding: 1.2rem; text-align: center; }
+
+@media print {
+  .top, .normbar, .tabs, .actions, .noprint { display: none !important; }
+  body { background: #fff; }
+  .panel, .tablewrap { border: 0; padding: 0; }
+}
+.tbl td:first-child { min-width: 180px; }
+.demo { font-size: .66rem; background: var(--accent); color: #fff; padding: .1rem .4rem; border-radius: 4px; letter-spacing: .05em; }
+.rolesel { background: #2f3236; color: #fff; border: 1px solid #44484d; max-width: 320px; padding: .35rem .5rem; font-size: .85rem; }
+.savebar { position: sticky; bottom: 0; background: #fff; padding: .8rem 0 .2rem; border-top: 1px solid var(--line); }
+.report { max-width: 900px; margin: 0 auto; background: #fff; padding: 1.5rem; border-radius: var(--radius); }
+.report .tbl td, .report .tbl th { padding: .35rem .4rem; font-size: .85rem; }
+.report h2 { border-bottom: 2px solid var(--ink); padding-bottom: .2rem; }
+.sign { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2.5rem; font-size: .9rem; }
+.sign div { border-top: 1px solid var(--ink); padding-top: .3rem; }
+@media (max-width: 600px) { .who { width: 100%; padding-bottom: .5rem; } .rolesel { max-width: 100%; width: 100%; } }
+@media (max-width: 760px) {
+  .top .wrap { gap: .4rem; padding-top: .5rem; }
+  .nav { order: 3; width: 100%; flex: none; flex-wrap: nowrap; overflow-x: auto; }
+  .nav a { white-space: nowrap; }
+  .who { order: 2; }
+}
+
+</style></head>
+<body><div id="app"></div>
+<script>
+// ===== Нормативная база (копия norms.py полной версии) =====
+const NORMS_NOTE = "Нормативная база: ППР в РФ (ПП РФ № 1479, действуют по 31.12.2026), 123-ФЗ, приказ МЧС № 1120, ГОСТ Р 59637-2021, ГОСТ Р 59641-2021. С 2027 г. правила утверждает МЧС России — номера пунктов изменятся.";
+
+const FCLASSES = [
+  ["Ф1.1","Детские сады, больницы, дома престарелых, спальные корпуса интернатов"],
+  ["Ф1.2","Гостиницы, общежития, спальные корпуса санаториев и домов отдыха"],
+  ["Ф1.3","Многоквартирные жилые дома"],["Ф1.4","Одноквартирные жилые дома"],
+  ["Ф2.1","Театры, кинотеатры, концертные залы, клубы, цирки (в помещениях)"],
+  ["Ф2.2","Музеи, выставки, танцевальные залы (в помещениях)"],
+  ["Ф2.3","Зрелищные учреждения на открытом воздухе"],["Ф2.4","Музеи, выставки и т.п. на открытом воздухе"],
+  ["Ф3.1","Торговля"],["Ф3.2","Общественное питание"],["Ф3.3","Вокзалы"],["Ф3.4","Поликлиники и амбулатории"],
+  ["Ф3.5","Бытовое и коммунальное обслуживание"],["Ф3.6","Физкультурно-оздоровительные комплексы, спортзалы без трибун"],
+  ["Ф4.1","Школы, внешкольные учреждения, СПО"],["Ф4.2","Вузы, организации ДПО"],
+  ["Ф4.3","Органы управления, офисы, банки, НИИ, редакции"],["Ф4.4","Пожарные депо"],
+  ["Ф5.1","Производственные здания, лаборатории, мастерские"],["Ф5.2","Складские здания, стоянки, архивы, книгохранилища"],
+  ["Ф5.3","Сельскохозяйственные здания"],
+];
+const DUP_SIGNAL = ["Ф1.1","Ф1.2","Ф4.1","Ф4.2"];
+
+const QUESTIONNAIRE = [
+  {title:"Общие сведения", fields:[
+    {key:"purpose",label:"Назначение объекта",type:"text",hint:"Например: офисный центр, склад, ТЦ"},
+    {key:"usage_right",label:"Кто эксплуатирует",type:"select",options:["Собственник","Арендатор","Управляющая организация","Иное"]},
+    {key:"responsible_name",label:"Ответственный за пожарную безопасность (ФИО)",type:"text"},
+    {key:"responsible_position",label:"Должность ответственного",type:"text"},
+    {key:"responsible_phone",label:"Телефон ответственного",type:"text"},
+  ]},
+  {title:"Характеристики здания", fields:[
+    {key:"fclass",label:"Класс функциональной пожарной опасности",type:"select",options:FCLASSES.map(([c,d])=>`${c} — ${d}`)},
+    {key:"floors",label:"Этажность (надземных этажей)",type:"number"},
+    {key:"underground",label:"Подземных этажей",type:"number"},
+    {key:"height_m",label:"Пожарно-техническая высота, м",type:"number"},
+    {key:"area_m2",label:"Общая площадь, м²",type:"number"},
+    {key:"fire_resistance",label:"Степень огнестойкости",type:"select",options:["I","II","III","IV","V","Не установлена"]},
+    {key:"constr_class",label:"Класс конструктивной пожарной опасности",type:"select",options:["С0","С1","С2","С3","Не установлен"]},
+    {key:"year_built",label:"Год ввода в эксплуатацию",type:"number"},
+  ]},
+  {title:"Люди на объекте", fields:[
+    {key:"max_people",label:"Максимум людей одновременно",type:"number",hint:"50 и более — объект с массовым пребыванием людей (п. 5 ППР)"},
+    {key:"workplaces10",label:"Есть этаж с 10 и более постоянными рабочими местами",type:"bool"},
+    {key:"night_stay",label:"Ночное пребывание людей / круглосуточное дежурство персонала",type:"bool"},
+    {key:"mgn",label:"Пребывают маломобильные группы населения",type:"bool"},
+  ]},
+  {title:"Пожарная опасность и документы", fields:[
+    {key:"has_prod_storage",label:"Есть производственные или складские помещения",type:"bool"},
+    {key:"categories",label:"Категории помещений по взрывопожарной и пожарной опасности",type:"text",hint:"Например: В3, В4, Д"},
+    {key:"categories_ab",label:"Есть помещения категорий А или Б",type:"bool"},
+    {key:"declaration",label:"Требуется декларация пожарной безопасности (ст. 64 123-ФЗ)",type:"select",options:["Не знаю","Да","Нет"]},
+    {key:"risk_calc",label:"Выполнен расчёт пожарного риска",type:"bool"},
+    {key:"stu",label:"Есть специальные технические условия (СТУ)",type:"bool"},
+    {key:"facade_banners",label:"На фасаде есть баннеры, транспаранты, конструкции",type:"bool"},
+    {key:"smoking_place",label:"Есть отведённое место для курения",type:"bool"},
+    {key:"notes",label:"Примечания",type:"textarea"},
+  ]},
+];
+
+const LIFE = [{key:"year",label:"Год ввода",type:"number"},{key:"life",label:"Срок службы, лет",type:"number",hint:"по паспорту, обычно 10"}];
+const SYSTEMS = {
+  aps:{name:"Автоматическая пожарная сигнализация (АПС)",spz:true,fields:[
+    {key:"kind",label:"Тип",type:"select",options:["Адресная","Адресно-аналоговая","Пороговая"]},
+    {key:"brand",label:"Оборудование (марка ППКП)",type:"text"},{key:"detectors",label:"Кол-во извещателей",type:"number"},...LIFE]},
+  soue:{name:"Система оповещения и управления эвакуацией (СОУЭ)",spz:true,fields:[
+    {key:"type",label:"Тип СОУЭ",type:"select",options:["1","2","3","4","5"]},{key:"brand",label:"Оборудование",type:"text"},...LIFE]},
+  aupt:{name:"Автоматическая установка пожаротушения (АУПТ)",spz:true,fields:[
+    {key:"kind",label:"Вид",type:"select",options:["Водяное спринклерное","Водяное дренчерное","Тонкораспылённая вода","Газовое","Порошковое","Аэрозольное","Пенное"]},
+    {key:"rooms",label:"Защищаемые помещения",type:"text"},...LIFE]},
+  smoke:{name:"Противодымная вентиляция (дымоудаление, подпор)",spz:true,fields:[{key:"kind",label:"Состав",type:"text",hint:"дымоудаление, подпор, клапаны"},...LIFE]},
+  monitoring:{name:"Вывод сигнала на пульт пожарной охраны (ПАК)",spz:true,fields:[{key:"brand",label:"Оборудование / оператор",type:"text",hint:"например, ПАК «Стрелец-Мониторинг»"},...LIFE]},
+  vpv:{name:"Внутренний противопожарный водопровод (ВПВ)",spz:true,fields:[{key:"cranes",label:"Кол-во пожарных кранов",type:"number"}]},
+  pumps:{name:"Пожарная насосная станция / задвижки с электроприводом",spz:true,fields:[{key:"units",label:"Кол-во насосных агрегатов",type:"number"}]},
+  outer_water:{name:"Наружное противопожарное водоснабжение",spz:false,fields:[
+    {key:"kind",label:"Источники",type:"select",options:["Пожарные гидранты","Пожарный водоём / резервуар","Гидранты и водоём"]},
+    {key:"count",label:"Количество",type:"number"},{key:"distance",label:"Расстояние до объекта, м",type:"number"}]},
+  extinguishers:{name:"Огнетушители",spz:false,fields:[{key:"count",label:"Количество",type:"number"},{key:"types",label:"Типы",type:"text",hint:"ОП-4, ОУ-3 ..."}]},
+  fire_doors:{name:"Противопожарные двери, ворота, люки, окна",spz:false,fields:[{key:"count",label:"Количество",type:"number"}]},
+  emergency_light:{name:"Аварийное (эвакуационное) освещение",spz:false,fields:[{key:"count",label:"Кол-во светильников",type:"number"}]},
+  fireproof:{name:"Огнезащитная обработка конструкций",spz:false,fields:[
+    {key:"what",label:"Что обработано",type:"text",hint:"металлоконструкции, деревянная кровля..."},{key:"agent",label:"Огнезащитный состав",type:"text"},
+    {key:"year",label:"Год обработки",type:"number"},{key:"life",label:"Срок службы покрытия, лет",type:"number"}]},
+  ladders:{name:"Наружные пожарные лестницы и ограждения кровли",spz:false,fields:[{key:"count",label:"Кол-во лестниц",type:"number"}]},
+  ventilation:{name:"Общеобменная вентиляция",spz:false,fields:[{key:"ozk",label:"Есть огнезадерживающие клапаны",type:"bool"}]},
+  stove:{name:"Печное отопление / кухонные плиты на твёрдом топливе",spz:false,fields:[{key:"continuous",label:"Непрерывная топка",type:"bool"}]},
+};
+
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const fcode = p => (p.fclass || "").split(" ")[0];
+const isMass = p => num(p.max_people) >= 50 || !!p.workplaces10;
+const has = (s, c) => c in s;
+const anySpz = s => Object.keys(s).some(c => SYSTEMS[c] && SYSTEMS[c].spz);
+function overLife(s, y) {
+  const out = [];
+  for (const [c, prm] of Object.entries(s)) {
+    if (!SYSTEMS[c] || !SYSTEMS[c].spz) continue;
+    const yr = num(prm.year), life = num(prm.life) || 10;
+    if (yr && yr + life <= y) out.push(SYSTEMS[c].name);
+  }
+  return out;
+}
+
+const TASKS = [
+  {code:"instr_repeat",title:"Повторный противопожарный инструктаж",period:(p,s)=>(isMass(p)||p.categories_ab)?6:12,side:"client",ref:"Приказ МЧС России от 16.12.2024 № 1120",hint:"Не реже 1 раза в год; для объектов с массовым пребыванием и категорий А, Б система ставит 6 мес. — уточните для вашего объекта",applies:()=>true},
+  {code:"evac_drill",title:"Практическая тренировка по эвакуации",period:6,side:"client",ref:"ППР п. 9",hint:"Объект с массовым пребыванием людей — не реже 1 раза в полугодие",applies:p=>isMass(p)},
+  {code:"sizod_check",title:"Проверка СИЗОД и ручных фонарей дежурного персонала",period:12,side:"client",ref:"ППР п. 7",hint:"Запись в журнале эксплуатации СПЗ",applies:p=>!!p.night_stay},
+  {code:"spz_plan",title:"Годовой план-график ТО и ППР систем противопожарной защиты",period:12,side:"provider",ref:"ППР п. 54",applies:(p,s)=>anySpz(s)},
+  {code:"aps_to",title:"Регламентное ТО АПС",period:1,side:"provider",ref:"ППР п. 54, регламент изготовителя",system:"aps",applies:(p,s)=>has(s,"aps")},
+  {code:"soue_to",title:"Регламентное ТО СОУЭ",period:1,side:"provider",ref:"ППР п. 54, регламент изготовителя",system:"soue",applies:(p,s)=>has(s,"soue")},
+  {code:"aupt_to",title:"Регламентное ТО АУПТ",period:1,side:"provider",ref:"ППР п. 54, регламент изготовителя",system:"aupt",applies:(p,s)=>has(s,"aupt")},
+  {code:"smoke_to",title:"Регламентное ТО противодымной вентиляции",period:1,side:"provider",ref:"ППР п. 54, регламент изготовителя",system:"smoke",applies:(p,s)=>has(s,"smoke")},
+  {code:"monitoring_to",title:"ТО оборудования вывода сигнала на пульт пожарной охраны",period:1,side:"provider",ref:"ППР п. 54; ч. 7 ст. 83 123-ФЗ",system:"monitoring",applies:(p,s)=>has(s,"monitoring")},
+  {code:"over_life_test",title:"Ежегодные испытания систем, эксплуатируемых сверх срока службы",period:12,side:"provider",ref:"ППР п. 54",hint:"Система определяет по году ввода и сроку службы из анкеты",applies:(p,s,y)=>overLife(s,y).length>0},
+  {code:"vpv_check",title:"Проверка работоспособности ВПВ с актом (весна и осень)",period:6,side:"provider",ref:"ППР п. 50",system:"vpv",applies:(p,s)=>has(s,"vpv")},
+  {code:"vpv_hoses",title:"Перекатка пожарных рукавов",period:12,side:"provider",ref:"ППР п. 50",system:"vpv",applies:(p,s)=>has(s,"vpv")},
+  {code:"pumps_check",title:"Проверка пожарных насосных агрегатов",period:1,side:"provider",ref:"ППР п. 52",system:"pumps",applies:(p,s)=>has(s,"pumps")},
+  {code:"valves_check",title:"Проверка задвижек с электроприводом",period:6,side:"provider",ref:"ППР п. 52",system:"pumps",applies:(p,s)=>has(s,"pumps")},
+  {code:"outer_water_check",title:"Проверка наружного противопожарного водоснабжения с актом (весна и осень)",period:6,side:"provider",ref:"ППР п. 48",system:"outer_water",applies:(p,s)=>has(s,"outer_water")},
+  {code:"ext_inspect",title:"Осмотр огнетушителей (наличие, пломбы, давление)",period:3,side:"client",ref:"ГОСТ Р 59641-2021, паспорт огнетушителя",system:"extinguishers",hint:"Рекомендуемая периодичность — уточните по паспорту",applies:(p,s)=>has(s,"extinguishers")},
+  {code:"ext_annual",title:"Ежегодное техническое обслуживание огнетушителей",period:12,side:"provider",ref:"ППР п. 60, ГОСТ Р 59641-2021",system:"extinguishers",applies:(p,s)=>has(s,"extinguishers")},
+  {code:"ext_recharge",title:"Перезарядка огнетушителей",period:60,side:"provider",ref:"ППР п. 60, паспорт огнетушителя",system:"extinguishers",hint:"Срок — по паспорту; для порошковых обычно 5 лет",applies:(p,s)=>has(s,"extinguishers")},
+  {code:"fireproof_check",title:"Проверка состояния огнезащитной обработки с актом",period:12,side:"provider",ref:"ППР п. 13, ГОСТ Р 59637-2021",system:"fireproof",hint:"Ежегодно, если в документации изготовителя не указан другой срок",applies:(p,s)=>has(s,"fireproof")},
+  {code:"ladders_inspect",title:"Обследование целостности наружных лестниц и ограждений кровли (акт)",period:12,side:"provider",ref:"Наработка сотрудников (п. 19 опросного листа)",system:"ladders",applies:(p,s)=>has(s,"ladders")},
+  {code:"ladders_test",title:"Эксплуатационные испытания пожарных лестниц и ограждений кровли (протокол)",period:60,side:"provider",ref:"ППР п. 17",system:"ladders",applies:(p,s)=>has(s,"ladders")},
+  {code:"vent_clean",title:"Очистка венткамер, циклонов, фильтров и воздуховодов (акт)",period:12,side:"client",ref:"ППР п. 43",system:"ventilation",applies:(p,s)=>has(s,"ventilation")},
+  {code:"dampers_check",title:"Проверка огнезадерживающих устройств и блокировок вентиляции",period:12,side:"provider",ref:"ППР п. 42",system:"ventilation",hint:"Срок — по технической документации изготовителя",applies:(p,s)=>!!(s.ventilation&&s.ventilation.ozk)||has(s,"smoke")},
+  {code:"fire_doors_check",title:"Осмотр противопожарных дверей (самозакрывание, уплотнения)",period:3,side:"client",ref:"ППР п. 14",system:"fire_doors",hint:"Рекомендуемая периодичность",applies:(p,s)=>has(s,"fire_doors")},
+  {code:"emergency_light_check",title:"Проверка работоспособности аварийного освещения",period:6,side:"provider",ref:"Документация изготовителя",system:"emergency_light",hint:"Рекомендуемая периодичность",applies:(p,s)=>has(s,"emergency_light")},
+  {code:"chimney_clean",title:"Очистка дымоходов и печей от сажи",period:(p,s)=>(s.stove&&s.stove.continuous)?1:3,side:"client",ref:"ППР п. 78",system:"stove",applies:(p,s)=>has(s,"stove")},
+];
+const TASKS_BY_CODE = Object.fromEntries(TASKS.map(t => [t.code, t]));
+const taskPeriod = (t, p, s) => typeof t.period === "function" ? t.period(p, s) : t.period;
+
+const ALL = () => true;
+const CHECKLIST = [
+  [1,"Квалификационные удостоверения о прохождении должностными лицами обучения по программе ДПО, с копией лицензии обучавшей организации","ППР п. 3",ALL],
+  [2,"Документы о проведении обучения мерам пожарной безопасности (журнал учёта противопожарных инструктажей)","Приказ МЧС № 1120",ALL],
+  [3,"Утверждённые руководителем программы вводного, первичного, повторного, внепланового противопожарных инструктажей","Приказ МЧС № 1120",ALL],
+  [4,"Инструкции о мерах пожарной безопасности по разделу XVIII ППР","ППР п. 2, разд. XVIII",ALL],
+  [5,"Ручные фонари и СИЗОД (не менее 1 на каждого дежурного); запись в журнале эксплуатации СПЗ о ежегодной проверке СИЗОД","ППР п. 7",p=>!!p.night_stay],
+  [6,"Информация (стикеры) о месте хранения ключей на дверях чердаков, техэтажей, подвалов, закрываемых на замок","ППР",ALL],
+  [7,"Инструкция в помещении пожарного поста о действиях дежурного персонала при сигналах о пожаре и неисправности","ППР",(p,s)=>has(s,"aps")||!!p.night_stay],
+  [8,"Журнал регистрации извещений в процессе эксплуатации системы пожарной сигнализации","ППР",(p,s)=>has(s,"aps")],
+  [9,"Приказы о назначении должностных лиц, ответственных за обеспечение пожарной безопасности","ППР",ALL],
+  [10,"Документы о проведении практических тренировок по эвакуации (не реже 1 раза в полугодие)","ППР п. 9",p=>isMass(p)],
+  [11,"В местах установки ППКП — перечень помещений, защищаемых установками противопожарной защиты","ППР",(p,s)=>has(s,"aps")||has(s,"aupt")],
+  [12,"Знаки «Место курения» в отведённых для курения местах","ППР",p=>!!p.smoking_place],
+  [13,"Документы о показателях пожарной опасности баннеров и конструкций на фасадах (не ниже Г1, В1, Д2, Т2)","ППР",p=>!!p.facade_banners],
+  [14,"Аварийное освещение на путях эвакуации","ППР",ALL],
+  [15,"Отличительные знаки или окраска светильников аварийного освещения","ППР",(p,s)=>has(s,"emergency_light")],
+  [16,"Заделка негорючими материалами отверстий и зазоров в местах пересечения противопожарных преград коммуникациями","ППР",ALL],
+  [17,"Акты очистки вентиляционных камер, циклонов, фильтров и воздуховодов (не реже 1 раза в год)","ППР п. 43",(p,s)=>has(s,"ventilation")],
+  [18,"Указатели гидрантов и водоёмов на фасаде (светоотражающие или световые) с цифрами расстояния","ППР",(p,s)=>has(s,"outer_water")],
+  [19,"Акты обследования целостности наружных металлических лестниц и ограждений кровли (не реже 1 раза в год)","ППР п. 17",(p,s)=>has(s,"ladders")],
+  [20,"Сертификаты пожарной безопасности на отделочные материалы путей эвакуации (стены, пол, потолок)","ППР",ALL],
+  [21,"Сертификаты на огнетушители, карточки учёта, акты постановки на оснащение, журналы осмотра и перезарядки","ППР п. 60",(p,s)=>has(s,"extinguishers")],
+  [22,"Приказ о назначении ответственного за приобретение, сохранность, контроль и перезарядку огнетушителей","ППР п. 60",(p,s)=>has(s,"extinguishers")],
+  [23,"Сертификаты на противопожарные двери, ворота, люки и окна","ППР",(p,s)=>has(s,"fire_doors")],
+  [24,"Приказ о назначении ответственного за состояние противопожарных дверей, ворот, люков, окон","ППР",(p,s)=>has(s,"fire_doors")],
+  [25,"Приказ о назначении ответственного за эксплуатацию и ТО внутреннего противопожарного водопровода","ППР п. 50",(p,s)=>has(s,"vpv")],
+  [26,"Декларация пожарной безопасности (ст. 64 123-ФЗ), если требуется","ст. 64 123-ФЗ",p=>p.declaration!=="Нет"],
+  [27,"Исполнительная (проектная) документация на системы противопожарной защиты","ППР п. 54",(p,s)=>anySpz(s)],
+  [28,"Расчёты категорий помещений по взрывопожарной и пожарной опасности и классов зон (гл. 5, 7, 8 123-ФЗ)","123-ФЗ",p=>!!p.has_prod_storage],
+  [29,"Журнал эксплуатации систем противопожарной защиты","ППР п. 17(1)",ALL],
+  [30,"Договор на ТО систем противопожарной защиты с организацией, имеющей лицензию МЧС","ПП РФ № 1128 от 28.07.2020",(p,s)=>anySpz(s)],
+  [31,"Годовой план-график регламентных работ по ТО и ППР систем противопожарной защиты","ППР п. 54",(p,s)=>anySpz(s)],
+  [32,"Дублирование сигнала о пожаре на пульт пожарной охраны без участия персонала","ч. 7 ст. 83 123-ФЗ",p=>DUP_SIGNAL.includes(fcode(p))],
+  [33,"Акты проверки работоспособности ВПВ (весна и осень) и перекатки рукавов","ППР п. 50",(p,s)=>has(s,"vpv")],
+  [34,"Акты проверки источников наружного противопожарного водоснабжения (весна и осень)","ППР п. 48",(p,s)=>has(s,"outer_water")],
+  [35,"Акт проверки качества огнезащитной обработки, документация на огнезащитный состав","ППР п. 13, ГОСТ Р 59637-2021",(p,s)=>has(s,"fireproof")],
+  [36,"Протокол эксплуатационных испытаний пожарных лестниц и ограждений кровли (не реже 1 раза в 5 лет)","ППР п. 17",(p,s)=>has(s,"ladders")],
+];
+
+function normWarnings(p, s, y) {
+  const out = [], fc = fcode(p);
+  if (DUP_SIGNAL.includes(fc) && !has(s,"monitoring")) out.push(`Класс ${fc}: требуется дублирование сигнала о пожаре на пульт пожарной охраны (ч. 7 ст. 83 123-ФЗ), а в анкете нет системы вывода сигнала.`);
+  if (!has(s,"extinguishers")) out.push("В анкете не указаны огнетушители — объект должен быть оснащён первичными средствами пожаротушения (ППР п. 60, разд. XIX).");
+  if (isMass(p) && !has(s,"soue")) out.push("Объект с массовым пребыванием людей, но СОУЭ не указана — проверьте по СП 3.13130.");
+  if (isMass(p) && !has(s,"aps") && !has(s,"aupt")) out.push("Нет АПС/АУПТ при массовом пребывании людей — проверьте требования СП 486.1311500.");
+  const old = overLife(s, y);
+  if (old.length) out.push("Срок службы истёк: " + old.join("; ") + ". Нужны ежегодные испытания или замена (ППР п. 54).");
+  const fp = s.fireproof;
+  if (fp && num(fp.year) && num(fp.life) && num(fp.year) + num(fp.life) <= y) out.push("Истёк срок службы огнезащитного покрытия — требуется повторная обработка или испытания (ППР п. 13).");
+  return out;
+}
+
+// ===== Демо-версия «Мониторинг ПБ»: все данные хранятся в браузере =====
+const KEY = "firemon_demo_v1", ROLE_KEY = "firemon_demo_role";
+const SIDE = {client:"Эксплуатант", provider:"Обслуживающая организация"};
+const TSTATUS = {overdue:["Просрочено","red"], soon:["Скоро срок","yellow"], ok:["В норме","green"], nodata:["Нет данных","gray"]};
+const LEVELS = {red:"Требует внимания", yellow:"Есть вопросы", green:"В норме"};
+const SEV = {critical:"Критическое", medium:"Значительное", low:"Незначительное"};
+const ISTATUS = {open:"Открыто", in_progress:"В работе", resolved:"Устранено"};
+const IKIND = {remark:"Замечание", request:"Заявка"};
+const ANSWERS = {yes:"Да", no:"Нет", na:"Н/П"};
+const WORK_TYPES = ["Техническое обслуживание","Проверка работоспособности","Испытания","Осмотр","Ремонт","Перезарядка / замена","Инструктаж","Тренировка","Прочее"];
+const RESULTS = ["Исправно / выполнено","Выполнено с замечаниями","Неисправно"];
+
+// ---------- утилиты ----------
+const h = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const TODAY = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const parse = s => { if (!s) return null; const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const ruDate = s => { const d = parse(String(s||"").slice(0,10)); return d ? d.toLocaleDateString("ru-RU") : "—"; };
+function addMonths(d, m) {
+  const t = new Date(d.getFullYear(), d.getMonth() + m, 1);
+  const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+  t.setDate(Math.min(d.getDate(), last)); return t;
+}
+const days = (a, b) => Math.round((a - b) / 86400000);
+function periodLabel(m) {
+  if (m === 1) return "ежемесячно"; if (m === 3) return "раз в квартал"; if (m === 6) return "раз в полгода";
+  if (m % 12 === 0) { const y = m / 12; return y === 1 ? "раз в год" : y >= 5 ? `раз в ${y} лет` : `раз в ${y} года`; }
+  return `раз в ${m} мес.`;
+}
+const pill = (cls, text) => `<span class="pill ${cls}">${h(text)}</span>`;
+
+// ---------- хранилище ----------
+let DB, ROLE;
+function load() {
+  try { DB = JSON.parse(localStorage.getItem(KEY)); } catch (e) { DB = null; }
+  if (!DB || !DB.objects) { DB = seed(); save(); }
+  try { ROLE = JSON.parse(localStorage.getItem(ROLE_KEY)); } catch (e) { ROLE = null; }
+  if (!ROLE) ROLE = {mode:"provider"};
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { alert("Не удалось сохранить: закончилось место в браузере."); } }
+const nid = () => ++DB.seq;
+const isProv = () => ROLE.mode === "provider";
+const userName = () => isProv() ? "Инженер (демо)" : "Представитель: " + (client(ROLE.clientId)?.name || "");
+const client = id => DB.clients.find(c => c.id === id);
+const obj = id => DB.objects.find(o => o.id === id);
+const visible = () => DB.objects.filter(o => !o.archived && (isProv() || o.clientId === ROLE.clientId));
+
+// ---------- логика ----------
+function syncTasks(o) {
+  const y = TODAY().getFullYear(); o.tasks = o.tasks || {};
+  const appl = TASKS.filter(t => t.applies(o.profile, o.systems, y)).map(t => t.code);
+  for (const code of appl) {
+    const t = TASKS_BY_CODE[code], per = taskPeriod(t, o.profile, o.systems), ex = o.tasks[code];
+    if (ex) { ex.active = true; if (!ex.custom) ex.period = per; }
+    else o.tasks[code] = {period: per, custom: false, side: t.side, last: null, active: true};
+  }
+  for (const code in o.tasks) if (!appl.includes(code)) o.tasks[code].active = false;
+}
+function taskRows(o) {
+  const today = TODAY(), rows = [];
+  for (const [code, r] of Object.entries(o.tasks || {})) {
+    const t = TASKS_BY_CODE[code]; if (!t || !r.active) continue;
+    const last = parse(r.last), due = last ? addMonths(last, r.period) : null;
+    let status = "nodata", dd = null;
+    if (due) { dd = days(due, today); const warn = r.period <= 1 ? 7 : 30; status = dd < 0 ? "overdue" : dd <= warn ? "soon" : "ok"; }
+    rows.push({code, ...t, side: r.side, period: r.period, custom: r.custom, last: r.last, due: due ? iso(due) : null, status, days: dd});
+  }
+  const ord = {overdue:0, nodata:1, soon:2, ok:3};
+  return rows.sort((a, b) => ord[a.status] - ord[b.status] || (a.due || "").localeCompare(b.due || ""));
+}
+function checklistRows(o) {
+  return CHECKLIST.filter(([, , , c]) => c(o.profile, o.systems)).map(([no, text, ref]) => {
+    const a = (o.checklist || {})[no] || {};
+    return {no, text, ref, fromFile: no <= 29, answer: a.answer || null, comment: a.comment || "", at: a.at};
+  });
+}
+function summary(o) {
+  const tasks = taskRows(o), cl = checklistRows(o).filter(c => c.answer !== "na");
+  const cnt = {overdue:0, soon:0, ok:0, nodata:0}; tasks.forEach(t => cnt[t.status]++);
+  const yes = cl.filter(c => c.answer === "yes").length, no = cl.filter(c => c.answer === "no").length;
+  const un = cl.filter(c => !c.answer).length;
+  const open = (o.issues || []).filter(i => i.status !== "resolved");
+  const crit = open.filter(i => i.severity === "critical").length;
+  const level = (cnt.overdue || no || crit) ? "red" : (cnt.soon || cnt.nodata || un || open.length) ? "yellow" : "green";
+  const lastJ = (o.journal || []).map(j => j.date).sort().pop();
+  return {tasks: cnt, clTotal: cl.length, yes, no, un, pct: cl.length ? Math.round(100 * yes / cl.length) : 0,
+          open: open.length, crit, req: open.filter(i => i.kind === "request").length, level, lastJ};
+}
+function addIssue(o, title, desc = "", severity = "medium", kind = "remark", due = null, clNo = null) {
+  o.issues = o.issues || [];
+  o.issues.push({id: nid(), title: title.slice(0, 300), desc, severity, status: "open", kind, due, clNo,
+                 created: iso(TODAY()), by: userName()});
+}
+function markDone(o, code, date) { const t = o.tasks[code]; if (t && (!t.last || t.last < date)) t.last = date; }
+
+// ---------- демо-данные ----------
+function seed() {
+  const db = {v: 1, seq: 100, clients: [], objects: []};
+  db.clients.push({id: 1, name: "ООО «Бизнес-Парк Север»", inn: "7700000000", contact: "Иванов И. И.", phone: "+7 900 000-00-00"});
+  db.clients.push({id: 2, name: "ИП Смирнова А. В. (арендатор)", contact: "Смирнова А. В."});
+  const ago = n => { const d = TODAY(); d.setDate(d.getDate() - n); return iso(d); };
+  const o1 = {id: 11, clientId: 1, name: "БЦ «Север», корпус А", address: "г. Москва, ул. Примерная, д. 1",
+    profile: {purpose:"Офисный центр", usage_right:"Собственник", responsible_name:"Иванов И. И.", responsible_position:"Главный инженер",
+      responsible_phone:"+7 900 000-00-00", fclass:"Ф4.3 — Органы управления, офисы, банки, НИИ, редакции", floors:"9", underground:"1",
+      height_m:"28", area_m2:"12500", fire_resistance:"II", constr_class:"С0", year_built:"2012", max_people:"600", workplaces10:true,
+      night_stay:true, mgn:true, declaration:"Да", facade_banners:true, smoking_place:true},
+    systems: {aps:{kind:"Адресная", brand:"Рубеж-2ОП", detectors:"840", year:"2012", life:"10"}, soue:{type:"3", brand:"Соната", year:"2012", life:"10"},
+      smoke:{kind:"дымоудаление, подпор", year:"2012", life:"15"}, vpv:{cranes:"36"}, pumps:{units:"2"},
+      outer_water:{kind:"Пожарные гидранты", count:"2", distance:"80"}, extinguishers:{count:"120", types:"ОП-4, ОУ-3"},
+      fire_doors:{count:"48"}, emergency_light:{count:"210"}, ventilation:{ozk:true}},
+    tasks: {}, checklist: {}, journal: [], issues: []};
+  const o2 = {id: 12, clientId: 1, name: "Склад №2", address: "Московская обл., г. Химки, Промзона, стр. 5",
+    profile: {purpose:"Склад непродовольственных товаров", usage_right:"Арендатор", responsible_name:"Сидоров П. П.",
+      fclass:"Ф5.2 — Складские здания, стоянки, архивы, книгохранилища", floors:"1", height_m:"12", area_m2:"4800",
+      fire_resistance:"IV", constr_class:"С0", year_built:"2018", max_people:"25", has_prod_storage:true, categories:"В2, В3",
+      declaration:"Не знаю", smoking_place:true},
+    systems: {aps:{kind:"Адресно-аналоговая", year:"2018", life:"10"}, aupt:{kind:"Водяное спринклерное", rooms:"складской зал", year:"2018", life:"10"},
+      soue:{type:"2", year:"2018", life:"10"}, extinguishers:{count:"30", types:"ОП-5"}, fireproof:{what:"металлоконструкции", year:"2018", life:"10"},
+      ladders:{count:"2"}},
+    tasks: {}, checklist: {}, journal: [], issues: []};
+  const o3 = {id: 13, clientId: 2, name: "Детский клуб «Радуга»", address: "г. Москва, ул. Садовая, д. 7, пом. 3",
+    profile: {purpose:"Детский развивающий центр", usage_right:"Арендатор", responsible_name:"Смирнова А. В.",
+      fclass:"Ф4.1 — Школы, внешкольные учреждения, СПО", floors:"1", area_m2:"220", max_people:"40", declaration:"Нет"},
+    systems: {aps:{kind:"Пороговая", year:"2021", life:"10"}, soue:{type:"2", year:"2021", life:"10"},
+      extinguishers:{count:"4", types:"ОП-4"}, emergency_light:{count:"12"}},
+    tasks: {}, checklist: {}, journal: [], issues: []};
+  db.objects.push(o1, o2, o3);
+  DB = db; let jid = 1000;
+  db.objects.forEach(syncTasks);
+  const hist = {11: {aps_to:20, soue_to:20, smoke_to:45, vpv_check:170, vpv_hoses:300, pumps_check:25, ext_inspect:80,
+                     ext_annual:340, evac_drill:200, instr_repeat:150, spz_plan:320},
+                12: {aps_to:10, aupt_to:10, soue_to:10, fireproof_check:400, ladders_test:900},
+                13: {aps_to:12, soue_to:12, ext_inspect:30, ext_annual:100, instr_repeat:90, spz_plan:60}};
+  for (const [oid, items] of Object.entries(hist)) {
+    const o = db.objects.find(x => x.id === +oid);
+    for (const [code, n] of Object.entries(items)) {
+      o.tasks[code].last = ago(n);
+      o.journal.push({id: jid++, date: ago(n), task: code, system: TASKS_BY_CODE[code].system || "", type: "Плановая работа",
+                      desc: TASKS_BY_CODE[code].title, result: RESULTS[0], performer: "Инженер Петров", by: "Инженер (демо)"});
+    }
+  }
+  [[1,"yes"],[2,"yes"],[3,"yes"],[4,"yes"],[9,"yes"],[14,"yes"],[16,"no"],[20,"yes"],[29,"yes"],[13,"no"]]
+    .forEach(([n, a]) => o1.checklist[n] = {answer: a, comment: "", at: iso(TODAY())});
+  o1.issues.push({id: 2001, title: "Чек-лист п. 16: не заделаны кабельные проходки на 3 этаже", desc: "Кабельный лоток у лифтового холла",
+                  severity: "medium", status: "open", kind: "remark", clNo: 16, created: ago(5), by: "Инженер (демо)"});
+  o1.issues.push({id: 2002, title: "Чек-лист п. 13: нет документов на баннер фасада", desc: "", severity: "low", status: "open",
+                  kind: "remark", clNo: 13, created: ago(5), by: "Инженер (демо)"});
+  o2.issues.push({id: 2003, title: "Не закрывается противопожарная дверь в рампе", desc: "Сломан доводчик", severity: "critical",
+                  status: "open", kind: "request", created: ago(2), by: "Представитель: ООО «Бизнес-Парк Север»"});
+  return db;
+}
+
+// ---------- общие куски разметки ----------
+function levelPill(l) { return pill(l, LEVELS[l]); }
+function tPill(s) { return pill(TSTATUS[s][1], TSTATUS[s][0]); }
+function sevPill(s) { return pill({critical:"red", medium:"yellow", low:"gray"}[s], SEV[s]); }
+function iPill(s) { return pill({open:"red", in_progress:"yellow", resolved:"green"}[s], ISTATUS[s]); }
+const opts = (list, sel) => list.map(v => `<option ${v === sel ? "selected" : ""}>${h(v)}</option>`).join("");
+const optsKV = (obj, sel) => Object.entries(obj).map(([k, v]) => `<option value="${h(k)}" ${k === sel ? "selected" : ""}>${h(v)}</option>`).join("");
+function sysParams(code, prm) {
+  return SYSTEMS[code].fields.filter(f => prm[f.key]).map(f => `${f.label}: ${prm[f.key] === true ? "да" : h(prm[f.key])}`).join("; ");
+}
+
+function header() {
+  const r = location.hash;
+  const nav = [["#/", "Объекты", r === "#/" || r === "" || r.startsWith("#/o/")], ["#/plan", "План-график", r === "#/plan"],
+    ["#/issues", "Замечания и заявки", r === "#/issues"]];
+  if (isProv()) nav.push(["#/clients", "Эксплуатанты", r === "#/clients"]);
+  const roleSel = `<select data-act="role" class="rolesel">
+      <option value="p" ${isProv() ? "selected" : ""}>Вход: обслуживающая организация</option>
+      ${DB.clients.map(c => `<option value="${c.id}" ${!isProv() && ROLE.clientId === c.id ? "selected" : ""}>Вход: эксплуатант — ${h(c.name)}</option>`).join("")}
+    </select>`;
+  return `<header class="top"><div class="wrap">
+    <a class="brand" href="#/"><span class="dot"></span>Мониторинг ПБ <span class="demo">ДЕМО</span></a>
+    <nav class="nav">${nav.map(([u, t, on]) => `<a href="${u}" class="${on ? "on" : ""}">${t}</a>`).join("")}<a href="#/data" class="${r === "#/data" ? "on" : ""}">Данные</a></nav>
+    <div class="who">${roleSel}</div></div></header>
+    <div class="normbar"><div class="wrap">${h(NORMS_NOTE)}</div></div>`;
+}
+
+// ---------- страницы ----------
+function pageDashboard() {
+  const q = (sessionStorage.getItem("q") || "").toLowerCase();
+  const rows = visible().filter(o => !q || `${o.name} ${o.address} ${client(o.clientId)?.name || ""}`.toLowerCase().includes(q))
+    .map(o => [o, summary(o)]);
+  const ord = {red:0, yellow:1, green:2};
+  rows.sort((a, b) => ord[a[1].level] - ord[b[1].level] || a[0].name.localeCompare(b[0].name));
+  const T = k => rows.filter(([, s]) => s.level === k).length;
+  const sum = f => rows.reduce((a, [, s]) => a + f(s), 0);
+  return `<div class="head"><div><h1>${isProv() ? "Объекты на обслуживании" : "Мои объекты"}</h1><div class="muted">${TODAY().toLocaleDateString("ru-RU")}</div></div>
+    <div class="actions">${isProv() ? `<a class="btn" href="#/new">+ Новый объект</a>` : ""}</div></div>
+    <div class="grid k" style="margin-bottom:1rem">
+      <div class="kpi"><div class="v">${rows.length}</div><div class="l">объектов</div></div>
+      <div class="kpi red"><div class="v">${T("red")}</div><div class="l">требуют внимания</div></div>
+      <div class="kpi yellow"><div class="v">${T("yellow")}</div><div class="l">есть вопросы</div></div>
+      <div class="kpi green"><div class="v">${T("green")}</div><div class="l">в норме</div></div>
+      <div class="kpi red"><div class="v">${sum(s => s.tasks.overdue)}</div><div class="l">просроченных работ</div></div>
+      <div class="kpi"><div class="v">${sum(s => s.open)}</div><div class="l">открытых замечаний${sum(s => s.req) ? `, из них заявок: ${sum(s => s.req)}` : ""}</div></div>
+    </div>
+    <form class="rowform" data-form="search" style="margin-bottom:.8rem"><input type="text" name="q" value="${h(q)}" placeholder="Поиск: название, адрес, эксплуатант" style="min-width:260px"><button class="btn ghost sm">Найти</button></form>
+    <div class="tablewrap"><table class="tbl"><thead><tr><th>Объект</th><th>Состояние</th><th>Чек-лист</th><th>Работы</th><th>Замечания</th><th>Последняя запись</th></tr></thead><tbody>
+    ${rows.map(([o, s]) => `<tr class="row-${s.level}">
+      <td><a href="#/o/${o.id}"><b>${h(o.name)}</b></a><div class="small muted">${h(o.address)}${isProv() && client(o.clientId) ? " · " + h(client(o.clientId).name) : ""}</div></td>
+      <td>${levelPill(s.level)}</td>
+      <td style="min-width:120px"><div class="bar"><i style="width:${s.pct}%"></i></div><div class="small muted">${s.yes} из ${s.clTotal}${s.no ? ` · <span style="color:var(--red)">нет: ${s.no}</span>` : ""}</div></td>
+      <td class="small">${s.tasks.overdue ? pill("red", "просрочено " + s.tasks.overdue) + " " : ""}${s.tasks.soon ? pill("yellow", "скоро " + s.tasks.soon) + " " : ""}${s.tasks.nodata ? pill("gray", "нет данных " + s.tasks.nodata) : ""}${!(s.tasks.overdue || s.tasks.soon || s.tasks.nodata) ? pill("green", "все в срок") : ""}</td>
+      <td class="small">${s.open ? s.open + (s.crit ? ` · <span style="color:var(--red)">крит.: ${s.crit}</span>` : "") : '<span class="muted">—</span>'}</td>
+      <td class="small muted">${ruDate(s.lastJ)}</td></tr>`).join("") ||
+      `<tr><td colspan="6" class="empty">${isProv() ? 'Объектов нет. <a href="#/new">Заведите первый объект</a>.' : "За этой организацией нет объектов."}</td></tr>`}
+    </tbody></table></div>`;
+}
+
+function objectHead(o, tab) {
+  const s = summary(o), c = client(o.clientId);
+  const tabs = [["", "Обзор"], ["checklist", "Чек-лист", s.no], ["schedule", "График работ", s.tasks.overdue], ["journal", "Журнал"],
+    ["issues", "Замечания и заявки", s.open]];
+  return `<div class="head"><div><h1>${h(o.name)}</h1><div class="muted">${h(o.address || "Адрес не указан")}${c ? " · " + h(c.name) : ""}</div></div>
+    <div class="actions">${levelPill(s.level)}<a class="btn ghost sm" href="#/o/${o.id}/report">Отчёт для печати</a><a class="btn ghost sm" href="#/o/${o.id}/edit">Анкета</a></div></div>
+    <nav class="tabs">${tabs.map(([t, n, cnt]) => `<a href="#/o/${o.id}${t ? "/" + t : ""}" class="${tab === t ? "on" : ""}">${n}${cnt ? `<span class="cnt">${cnt}</span>` : ""}</a>`).join("")}</nav>`;
+}
+
+function pageObject(o) {
+  const p = o.profile, s = o.systems, sm = summary(o), tasks = taskRows(o);
+  const shown = tasks.filter(t => ["overdue", "soon", "nodata"].includes(t.status));
+  const issues = (o.issues || []).filter(i => i.status !== "resolved");
+  const journal = [...(o.journal || [])].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0, 6);
+  const dl = [["Назначение", p.purpose], ["Класс ФПО", p.fclass], ["Этажность / высота", `${p.floors || "—"} эт. / ${p.height_m || "—"} м`],
+    ["Площадь", p.area_m2 ? p.area_m2 + " м²" : ""], ["Огнестойкость / класс К", `${p.fire_resistance || "—"} / ${p.constr_class || "—"}`],
+    ["Людей одновременно", p.max_people], ["Эксплуатирует", p.usage_right],
+    ["Ответственный за ПБ", [p.responsible_name, p.responsible_phone].filter(Boolean).join(", ")]];
+  return objectHead(o, "") + normWarnings(p, s, TODAY().getFullYear()).map(w => `<div class="warn">⚠ ${h(w)}</div>`).join("") + `
+  <div class="grid k" style="margin:1rem 0">
+    <div class="kpi ${sm.pct >= 90 ? "green" : sm.pct >= 60 ? "yellow" : "red"}"><div class="v">${sm.pct}%</div><div class="l">чек-лист выполнен (${sm.yes} из ${sm.clTotal})</div></div>
+    <div class="kpi red"><div class="v">${sm.tasks.overdue}</div><div class="l">просроченных работ</div></div>
+    <div class="kpi yellow"><div class="v">${sm.tasks.soon}</div><div class="l">работ скоро по сроку</div></div>
+    <div class="kpi"><div class="v">${sm.tasks.nodata}</div><div class="l">работ без данных</div></div>
+    <div class="kpi ${sm.crit ? "red" : ""}"><div class="v">${sm.open}</div><div class="l">открытых замечаний</div></div></div>
+  <div class="grid two"><div>
+    <div class="panel"><h2 style="margin-top:0">Ближайшие и просроченные работы</h2>
+      ${shown.length ? `<table class="tbl">${shown.slice(0, 8).map(t => `<tr><td>${h(t.title)}<div class="small muted">${SIDE[t.side]} · ${periodLabel(t.period)}</div></td><td style="white-space:nowrap">${tPill(t.status)}<div class="small muted">${t.due ? ruDate(t.due) : ""}</div></td></tr>`).join("")}</table>
+      ${shown.length > 8 ? `<p class="small"><a href="#/o/${o.id}/schedule">Все работы (${shown.length}) →</a></p>` : ""}` : `<p class="muted">Все работы выполняются в срок.</p>`}</div>
+    <div class="panel"><h2 style="margin-top:0">Открытые замечания</h2>
+      ${issues.map(i => `<div style="padding:.4rem 0;border-bottom:1px solid var(--line)">${sevPill(i.severity)} <span class="tag">${IKIND[i.kind]}</span> ${h(i.title)}${i.due ? `<span class="small muted"> · срок ${ruDate(i.due)}</span>` : ""}</div>`).join("") || `<p class="muted">Нет открытых замечаний.</p>`}
+      <p class="small"><a href="#/o/${o.id}/issues">${isProv() ? "Добавить замечание" : "Подать заявку"} →</a></p></div>
+  </div><div>
+    <div class="panel"><h2 style="margin-top:0">Объект</h2><dl class="kv">${dl.map(([k, v]) => `<dt>${k}</dt><dd>${h(v || "—")}</dd>`).join("")}</dl></div>
+    <div class="panel"><h2 style="margin-top:0">Системы и оборудование</h2>
+      ${Object.entries(s).filter(([c]) => SYSTEMS[c]).map(([c, prm]) => `<div style="padding:.35rem 0;border-bottom:1px solid var(--line)"><b>${h(SYSTEMS[c].name)}</b><div class="small muted">${sysParams(c, prm)}</div></div>`).join("") || `<p class="muted">Системы не указаны. <a href="#/o/${o.id}/edit">Заполните анкету</a>.</p>`}</div>
+    <div class="panel"><h2 style="margin-top:0">Последние записи журнала</h2>
+      ${journal.map(j => `<div class="small" style="padding:.3rem 0;border-bottom:1px solid var(--line)"><b>${ruDate(j.date)}</b> · ${h(j.desc || j.type)} — <span class="muted">${h(j.result)}</span></div>`).join("") || `<p class="muted">Записей пока нет.</p>`}</div>
+    ${isProv() ? `<button class="btn ghost sm" data-act="archive" data-id="${o.id}">В архив</button>` : ""}
+  </div></div>`;
+}
+
+function pageForm(o) {
+  const p = o ? o.profile : {}, s = o ? o.systems : {};
+  const field = (f, val, name) => {
+    if (f.type === "bool") return `<label class="check"><input type="checkbox" name="${name}" ${val ? "checked" : ""}> ${h(f.label)}</label>`;
+    let inp;
+    if (f.type === "select") inp = `<select name="${name}"><option value="">—</option>${opts(f.options, val)}</select>`;
+    else if (f.type === "textarea") inp = `<textarea name="${name}">${h(val)}</textarea>`;
+    else inp = `<input type="${f.type === "number" ? "number" : "text"}" step="any" name="${name}" value="${h(val)}">`;
+    return `<div class="field" ${f.type === "textarea" ? 'style="grid-column:1/-1"' : ""}><label>${h(f.label)}</label>${inp}${f.hint ? `<div class="hint">${h(f.hint)}</div>` : ""}</div>`;
+  };
+  return `<div class="head"><div><h1>${o ? "Анкета объекта" : "Новый объект"}</h1><div class="muted">По ответам система определит применимые требования, чек-лист и график регламентных работ.</div></div>
+    ${o ? `<div class="actions"><a class="btn ghost" href="#/o/${o.id}">← К объекту</a></div>` : ""}</div>
+  <form data-form="object" data-id="${o ? o.id : ""}">
+    <div class="panel"><h2 style="margin-top:0">Объект</h2><div class="fields">
+      <div class="field"><label>Название *</label><input type="text" name="name" required value="${h(o?.name)}"></div>
+      <div class="field"><label>Адрес</label><input type="text" name="address" value="${h(o?.address)}"></div>
+      ${isProv() ? `<div class="field"><label>Эксплуатирующая организация</label><select name="clientId"><option value="">— не выбрана —</option>${DB.clients.map(c => `<option value="${c.id}" ${o && o.clientId === c.id ? "selected" : ""}>${h(c.name)}</option>`).join("")}</select></div>
+      <div class="field"><label>…или новая организация</label><input type="text" name="newClient" placeholder="ООО «…» — будет создана"></div>` : ""}
+    </div></div>
+    ${QUESTIONNAIRE.map(sec => `<div class="panel"><h2 style="margin-top:0">${h(sec.title)}</h2><div class="fields">${sec.fields.map(f => field(f, p[f.key], "p_" + f.key)).join("")}</div></div>`).join("")}
+    <div class="panel"><h2 style="margin-top:0">Системы противопожарной защиты и оборудование</h2>
+      <p class="muted small">Отметьте, что есть на объекте, и заполните сведения. От этого зависят регламентные работы и пункты чек-листа.</p>
+      ${Object.entries(SYSTEMS).map(([code, sd]) => { const sp = s[code]; return `<div class="sys ${sp ? "on" : ""}">
+        <label class="check"><input type="checkbox" data-sys name="sys_${code}" ${sp ? "checked" : ""}> ${h(sd.name)}</label>
+        <div class="sysfields fields">${sd.fields.map(f => field(f, sp ? sp[f.key] : "", `s_${code}_${f.key}`)).join("")}</div></div>`; }).join("")}
+    </div>
+    <button class="btn">${o ? "Сохранить анкету" : "Создать объект"}</button></form>`;
+}
+
+function pageChecklist(o) {
+  const rows = checklistRows(o);
+  return objectHead(o, "checklist") + `<p class="muted small">Требования, применимые к объекту по анкете. Пп. 1–29 — из опросного листа сотрудников, остальные добавлены по системам объекта. «Нет» создаёт замечание, «Да» закрывает его. <i>В демо-версии файлы не прикрепляются.</i></p>
+  <form data-form="checklist" data-id="${o.id}" class="panel">
+    ${rows.map(r => `<div class="cl-item"><div class="cl-no">${r.no}</div>
+      <div>${h(r.text)}<div class="small muted">${h(r.ref)}${r.fromFile ? "" : ' · <span class="tag">по системам объекта</span>'}${r.at ? " · обновлено " + ruDate(r.at) : ""}</div></div>
+      <div class="cl-ans">${Object.entries(ANSWERS).map(([k, v]) => `<label><input type="radio" name="a_${r.no}" value="${k}" ${r.answer === k ? "checked" : ""}><span>${v}</span></label>`).join("")}</div>
+      <div class="cl-extra"><input type="text" name="c_${r.no}" value="${h(r.comment)}" placeholder="Комментарий, реквизиты документа"></div></div>`).join("")}
+    <div class="savebar"><button class="btn">Сохранить чек-лист</button></div></form>`;
+}
+
+function pageSchedule(o) {
+  const today = iso(TODAY());
+  return objectHead(o, "schedule") + `<p class="muted small">Работы сформированы по анкете. Отметка о выполнении создаёт запись в журнале и сдвигает следующий срок. «Нет данных» — внесите дату последнего выполнения.</p>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Работа</th><th>Кто</th><th>Периодичность</th><th>Выполнено</th><th>Следующий срок</th><th>Отметить выполнение</th></tr></thead><tbody>
+  ${taskRows(o).map(t => `<tr class="row-${t.status === "nodata" ? "" : TSTATUS[t.status][1]}">
+    <td><b>${h(t.title)}</b><div class="small muted">${h(t.ref)}</div>${t.hint ? `<div class="small muted">${h(t.hint)}</div>` : ""}</td>
+    <td class="small">${SIDE[t.side]}</td>
+    <td class="small">${periodLabel(t.period)}${t.custom ? ' <span class="tag">изменено</span>' : ""}
+      ${isProv() ? `<details><summary>изменить</summary><form data-form="taskedit" data-id="${o.id}" data-code="${t.code}" style="margin-top:.4rem">
+        <div class="field"><label>Месяцев</label><input type="number" name="period" min="1" max="120" value="${t.period}"></div>
+        <div class="field"><label>Кто выполняет</label><select name="side">${optsKV(SIDE, t.side)}</select></div>
+        <label class="check"><input type="checkbox" name="reset"> вернуть норматив</label><button class="btn sm">Сохранить</button></form></details>` : ""}</td>
+    <td class="small">${ruDate(t.last)}</td>
+    <td style="white-space:nowrap">${tPill(t.status)}<div class="small muted">${t.due ? ruDate(t.due) : ""} ${t.days === null ? "" : t.days < 0 ? `(${-t.days} дн. назад)` : `(через ${t.days} дн.)`}</div></td>
+    <td><form data-form="taskdone" data-id="${o.id}" data-code="${t.code}">
+      <div class="rowform"><input type="date" name="date" value="${today}" max="${today}" required><button class="btn sm">Выполнено</button></div>
+      <details><summary>результат, примечание</summary><select name="result" style="margin-top:.4rem">${opts(RESULTS)}</select>
+        <input type="text" name="note" placeholder="Примечание" style="margin-top:.4rem"><input type="text" name="performer" placeholder="Исполнитель" style="margin-top:.4rem"></details></form></td>
+  </tr>`).join("") || `<tr><td colspan="6" class="empty">Работ нет — заполните системы в анкете.</td></tr>`}
+  </tbody></table></div>`;
+}
+
+function pageJournal(o) {
+  const today = iso(TODAY()), sysOpts = Object.keys(o.systems).filter(c => SYSTEMS[c]);
+  const entries = [...(o.journal || [])].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  return objectHead(o, "journal") + `<div class="panel"><h2 style="margin-top:0">Новая запись</h2>
+    <form data-form="journal" data-id="${o.id}"><div class="fields">
+      <div class="field"><label>Дата</label><input type="date" name="date" value="${today}" max="${today}" required></div>
+      <div class="field"><label>Вид работ</label><select name="type">${opts(WORK_TYPES)}</select></div>
+      <div class="field"><label>Система</label><select name="system"><option value="">—</option>${sysOpts.map(c => `<option value="${c}">${h(SYSTEMS[c].name)}</option>`).join("")}</select></div>
+      <div class="field"><label>Засчитать как регламентную работу</label><select name="task"><option value="">— нет —</option>${taskRows(o).map(t => `<option value="${t.code}">${h(t.title)}</option>`).join("")}</select></div>
+      <div class="field"><label>Результат</label><select name="result">${opts(RESULTS)}</select><div class="hint">«Неисправно» создаст критическое замечание</div></div>
+      <div class="field"><label>Исполнитель</label><input type="text" name="performer" placeholder="${h(userName())}"></div>
+      <div class="field" style="grid-column:1/-1"><label>Описание</label><textarea name="desc" placeholder="Что сделано, что выявлено"></textarea></div>
+    </div><button class="btn">Добавить запись</button></form></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Дата</th><th>Работа</th><th>Система</th><th>Результат</th><th>Исполнитель</th></tr></thead><tbody>
+  ${entries.map(j => `<tr class="row-${j.result === "Неисправно" ? "red" : j.result === "Выполнено с замечаниями" ? "yellow" : ""}">
+    <td style="white-space:nowrap">${ruDate(j.date)}</td><td>${h(j.type)}${j.task ? ' <span class="tag">по графику</span>' : ""}<div class="small">${h(j.desc)}</div></td>
+    <td class="small">${SYSTEMS[j.system] ? h(SYSTEMS[j.system].name) : "—"}</td><td class="small">${h(j.result)}</td>
+    <td class="small">${h(j.performer)}<div class="muted">внёс: ${h(j.by || "")}</div></td></tr>`).join("") || `<tr><td colspan="5" class="empty">Записей нет</td></tr>`}
+  </tbody></table></div>`;
+}
+
+function issuesTable(list, showObj) {
+  const today = iso(TODAY());
+  return `<div class="tablewrap"><table class="tbl"><thead><tr><th>Замечание</th>${showObj ? "<th>Объект</th>" : ""}<th>Важность</th><th>Статус</th><th>Срок</th><th>Действие</th></tr></thead><tbody>
+  ${list.map(([o, i]) => `<tr class="row-${i.severity === "critical" && i.status !== "resolved" ? "red" : ""}">
+    <td><span class="tag">${IKIND[i.kind]}</span> <b>${h(i.title)}</b>${i.desc ? `<div class="small">${h(i.desc)}</div>` : ""}
+      <div class="small muted">${ruDate(i.created)} · ${h(i.by || "")}${i.resolution ? " · решение: " + h(i.resolution) : ""}</div></td>
+    ${showObj ? `<td class="small"><a href="#/o/${o.id}/issues">${h(o.name)}</a></td>` : ""}
+    <td>${sevPill(i.severity)}</td><td>${iPill(i.status)}${i.resolved ? `<div class="small muted">${ruDate(i.resolved)}</div>` : ""}</td>
+    <td class="small" style="${i.due && i.due < today && i.status !== "resolved" ? "color:var(--red)" : ""}">${ruDate(i.due)}</td>
+    <td><form data-form="issueupd" data-id="${o.id}" data-iid="${i.id}"><div class="rowform"><select name="status">${optsKV(ISTATUS, i.status)}</select><button class="btn sm">OK</button></div>
+      <details><summary>комментарий</summary><input type="text" name="resolution" placeholder="Что сделано" style="margin-top:.3rem"></details></form></td></tr>`).join("")
+    || `<tr><td colspan="6" class="empty">Нет записей</td></tr>`}</tbody></table></div>`;
+}
+const issueSort = (a, b) => (a.status === "resolved") - (b.status === "resolved") ||
+  ({critical:0, medium:1, low:2}[a.severity] - {critical:0, medium:1, low:2}[b.severity]) || (b.created || "").localeCompare(a.created || "");
+
+function pageIssues(o) {
+  return objectHead(o, "issues") + `<div class="panel"><h2 style="margin-top:0">${isProv() ? "Новое замечание" : "Заявка в обслуживающую организацию"}</h2>
+    <form data-form="issue" data-id="${o.id}"><div class="fields">
+      <div class="field" style="grid-column:1/-1"><label>Суть *</label><input type="text" name="title" required placeholder="${isProv() ? "Например: не работает извещатель в пом. 214" : "Например: сработала сигнализация, нужен выезд"}"></div>
+      <div class="field"><label>Важность</label><select name="severity">${optsKV(SEV, "medium")}</select></div>
+      <div class="field"><label>Срок устранения</label><input type="date" name="due"></div>
+      <div class="field" style="grid-column:1/-1"><label>Подробности</label><textarea name="desc"></textarea></div>
+    </div><button class="btn">${isProv() ? "Добавить" : "Отправить заявку"}</button></form></div>` +
+    issuesTable([...(o.issues || [])].sort(issueSort).map(i => [o, i]), false);
+}
+
+function pageAllIssues() {
+  const f = sessionStorage.getItem("ifilter") || "active";
+  const list = [];
+  visible().forEach(o => (o.issues || []).forEach(i => {
+    if (f === "all" || (f === "active" ? i.status !== "resolved" : i.status === f)) list.push([o, i]);
+  }));
+  list.sort((a, b) => issueSort(a[1], b[1]));
+  return `<div class="head"><h1>Замечания и заявки</h1><form class="rowform" data-form="ifilter"><select name="f">
+    <option value="active" ${f === "active" ? "selected" : ""}>Активные</option>${optsKV(ISTATUS, f)}<option value="all" ${f === "all" ? "selected" : ""}>Все</option></select><button class="btn ghost sm">Показать</button></form></div>` + issuesTable(list, true);
+}
+
+function pagePlan() {
+  const horizon = +(sessionStorage.getItem("horizon") || 60), side = sessionStorage.getItem("side") || "";
+  const items = [];
+  visible().forEach(o => taskRows(o).forEach(t => {
+    if (side && t.side !== side) return;
+    if (["overdue", "nodata"].includes(t.status) || (t.days !== null && t.days <= horizon)) items.push([o, t]);
+  }));
+  const ord = {overdue:0, soon:1, ok:2, nodata:3};
+  items.sort((a, b) => ord[a[1].status] - ord[b[1].status] || (a[1].due || "9999").localeCompare(b[1].due || "9999"));
+  return `<div class="head"><div><h1>План-график работ</h1><div class="muted">Просроченные, без данных и со сроком в ближайшие ${horizon} дней — по всем объектам</div></div>
+    <form class="rowform" data-form="plan"><select name="days">${[14, 30, 60, 90, 180, 365].map(d => `<option value="${d}" ${horizon === d ? "selected" : ""}>${d} дней</option>`).join("")}</select>
+    <select name="side"><option value="">Все исполнители</option>${optsKV(SIDE, side)}</select><button class="btn ghost sm">Показать</button></form></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Срок</th><th>Статус</th><th>Работа</th><th>Объект</th><th>Кто</th></tr></thead><tbody>
+  ${items.map(([o, t]) => `<tr><td style="white-space:nowrap">${t.due ? ruDate(t.due) : "—"}</td><td>${tPill(t.status)}</td>
+    <td>${h(t.title)}<div class="small muted">${h(t.ref)} · ${periodLabel(t.period)}</div></td>
+    <td><a href="#/o/${o.id}/schedule">${h(o.name)}</a><div class="small muted">${h(o.address)}</div></td><td class="small">${SIDE[t.side]}</td></tr>`).join("")
+    || `<tr><td colspan="5" class="empty">На выбранный период работ нет</td></tr>`}</tbody></table></div>`;
+}
+
+function pageClients() {
+  if (!isProv()) return `<div class="panel">Раздел доступен обслуживающей организации.</div>`;
+  return `<h1>Эксплуатирующие организации</h1><p class="muted">Собственники, арендаторы, управляющие компании. В полной версии у каждой организации свои логины; в демо — переключатель «Вход» вверху.</p>
+  <div class="panel"><h2 style="margin-top:0">Добавить организацию</h2><form data-form="client"><div class="fields">
+    <div class="field"><label>Название *</label><input type="text" name="name" required></div>
+    <div class="field"><label>ИНН</label><input type="text" name="inn"></div>
+    <div class="field"><label>Контактное лицо</label><input type="text" name="contact"></div>
+    <div class="field"><label>Телефон</label><input type="text" name="phone"></div></div><button class="btn">Добавить</button></form></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Организация</th><th>Контакт</th><th>Объектов</th></tr></thead><tbody>
+  ${DB.clients.map(c => `<tr><td><b>${h(c.name)}</b><div class="small muted">ИНН ${h(c.inn || "—")}</div></td><td class="small">${h(c.contact || "")} ${h(c.phone || "")}</td>
+    <td>${DB.objects.filter(o => o.clientId === c.id && !o.archived).length}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function pageData() {
+  return `<h1>Данные демо-версии</h1>
+  <div class="panel"><p>Все данные этой демо-версии хранятся <b>только в этом браузере на этом устройстве</b>. Другой сотрудник по той же ссылке увидит свою копию с демо-объектами. Чтобы передать свои записи коллеге, выгрузите файл и отправьте его — коллега загрузит его у себя.</p>
+  <div class="actions"><button class="btn" data-act="export">Выгрузить данные (файл)</button>
+  <label class="btn ghost" style="margin:0">Загрузить файл<input type="file" accept=".json" data-act="import" hidden></label>
+  <button class="btn ghost" data-act="reset">Сбросить к демо-данным</button></div></div>
+  <div class="panel small muted">В полной версии на сервере данные общие: инженер отметил ТО — эксплуатант сразу видит; эксплуатант подал заявку — она приходит вам. Там же вход по логину и паролю, прикрепление актов и фото.</div>`;
+}
+
+function pageReport(o) {
+  const p = o.profile, s = o.systems, sm = summary(o), c = client(o.clientId);
+  const issues = (o.issues || []).filter(i => i.status !== "resolved");
+  return `<div class="report"><div class="actions noprint" style="margin-bottom:1rem"><button class="btn" onclick="window.print()">Печать / сохранить PDF</button><a class="btn ghost" href="#/o/${o.id}">← К объекту</a></div>
+  <div class="small muted">Сформировано ${new Date().toLocaleString("ru-RU")} · «Мониторинг ПБ» (демо)</div>
+  <h1>Отчёт о противопожарном состоянии объекта</h1>
+  <p><b>${h(o.name)}</b>, ${h(o.address || "адрес не указан")}${c ? " · " + h(c.name) : ""}</p>
+  <p>Общая оценка: ${levelPill(sm.level)} · чек-лист ${sm.pct}% (${sm.yes}/${sm.clTotal}, «нет» — ${sm.no}, без ответа — ${sm.un}) · работ просрочено ${sm.tasks.overdue}, без данных ${sm.tasks.nodata} · открытых замечаний ${sm.open}</p>
+  ${normWarnings(p, s, TODAY().getFullYear()).map(w => `<div class="warn">⚠ ${h(w)}</div>`).join("")}
+  <h2>1. Сведения об объекте</h2><dl class="kv">${QUESTIONNAIRE.flatMap(sec => sec.fields).filter(f => p[f.key]).map(f => `<dt>${h(f.label)}</dt><dd>${p[f.key] === true ? "да" : h(p[f.key])}</dd>`).join("")}</dl>
+  <h2>2. Системы противопожарной защиты</h2><table class="tbl">${Object.entries(s).filter(([k]) => SYSTEMS[k]).map(([k, prm]) => `<tr><td><b>${h(SYSTEMS[k].name)}</b></td><td class="small">${sysParams(k, prm)}</td></tr>`).join("") || "<tr><td>Не указаны</td></tr>"}</table>
+  <h2>3. Регламентные работы</h2><table class="tbl"><tr><th>Работа</th><th>Норма</th><th>Период.</th><th>Выполнено</th><th>Срок</th><th>Статус</th></tr>
+  ${taskRows(o).map(t => `<tr><td>${h(t.title)}</td><td class="small">${h(t.ref)}</td><td class="small">${periodLabel(t.period)}</td><td>${ruDate(t.last)}</td><td>${t.due ? ruDate(t.due) : "—"}</td><td>${tPill(t.status)}</td></tr>`).join("")}</table>
+  <h2>4. Соблюдение требований (чек-лист)</h2><table class="tbl"><tr><th>№</th><th>Требование</th><th>Ответ</th><th>Комментарий</th></tr>
+  ${checklistRows(o).map(r => `<tr><td>${r.no}</td><td class="small">${h(r.text)}<div class="muted">${h(r.ref)}</div></td><td>${r.answer ? pill({yes:"green", no:"red", na:"gray"}[r.answer], ANSWERS[r.answer]) : '<span class="muted">—</span>'}</td><td class="small">${h(r.comment)}</td></tr>`).join("")}</table>
+  <h2>5. Открытые замечания</h2><table class="tbl"><tr><th>Замечание</th><th>Важность</th><th>Срок</th></tr>
+  ${issues.map(i => `<tr><td>${h(i.title)}${i.desc ? `<div class="small muted">${h(i.desc)}</div>` : ""}</td><td>${SEV[i.severity]}</td><td>${ruDate(i.due)}</td></tr>`).join("") || '<tr><td colspan="3">Нет</td></tr>'}</table>
+  <p class="small muted" style="margin-top:1.5rem">${h(NORMS_NOTE)}</p>
+  <div class="sign"><div>Представитель обслуживающей организации</div><div>Представитель эксплуатанта</div></div></div>`;
+}
+
+// ---------- роутер ----------
+function route() {
+  const parts = (location.hash || "#/").slice(2).split("/").filter(Boolean);
+  let html;
+  if (!parts.length) html = pageDashboard();
+  else if (parts[0] === "plan") html = pagePlan();
+  else if (parts[0] === "issues") html = pageAllIssues();
+  else if (parts[0] === "clients") html = pageClients();
+  else if (parts[0] === "data") html = pageData();
+  else if (parts[0] === "new") html = isProv() ? pageForm(null) : `<div class="panel">Новые объекты заводит обслуживающая организация.</div>`;
+  else if (parts[0] === "o") {
+    const o = obj(+parts[1]);
+    if (!o || (!isProv() && o.clientId !== ROLE.clientId)) html = `<div class="panel">Объект не найден или нет доступа. <a href="#/">К списку</a></div>`;
+    else html = ({"": pageObject, checklist: pageChecklist, schedule: pageSchedule, journal: pageJournal, issues: pageIssues,
+                  edit: pageForm, report: pageReport}[parts[2] || ""] || pageObject)(o);
+  } else html = pageDashboard();
+  const isReport = parts[2] === "report";
+  document.getElementById("app").innerHTML = (isReport ? "" : header()) +
+    `<main class="wrap">${flashHtml()}${html}</main>`;
+  document.querySelectorAll(".sys input[data-sys]").forEach(cb => cb.addEventListener("change", () => cb.closest(".sys").classList.toggle("on", cb.checked)));
+}
+let FLASH = null;
+const flash = (msg, cls = "ok") => { FLASH = [msg, cls]; };
+function flashHtml() { if (!FLASH) return ""; const [m, c] = FLASH; FLASH = null; return `<div class="flash ${c}">${h(m)}</div>`; }
+function go(hash) { if (location.hash === hash) route(); else location.hash = hash; window.scrollTo(0, 0); }
+
+// ---------- обработчики форм ----------
+const FORMS = {
+  search(f, d) { sessionStorage.setItem("q", d.get("q") || ""); route(); },
+  ifilter(f, d) { sessionStorage.setItem("ifilter", d.get("f")); route(); },
+  plan(f, d) { sessionStorage.setItem("horizon", d.get("days")); sessionStorage.setItem("side", d.get("side")); route(); },
+  object(f, d) {
+    const profile = {}, systems = {};
+    QUESTIONNAIRE.forEach(sec => sec.fields.forEach(fl => { profile[fl.key] = fl.type === "bool" ? d.has("p_" + fl.key) : (d.get("p_" + fl.key) || "").trim(); }));
+    for (const [code, sd] of Object.entries(SYSTEMS)) if (d.has("sys_" + code)) {
+      systems[code] = {}; sd.fields.forEach(fl => { const n = `s_${code}_${fl.key}`; systems[code][fl.key] = fl.type === "bool" ? d.has(n) : (d.get(n) || "").trim(); });
+    }
+    let clientId = null;
+    if (isProv()) {
+      const nc = (d.get("newClient") || "").trim();
+      if (nc) { clientId = nid(); DB.clients.push({id: clientId, name: nc}); } else clientId = d.get("clientId") ? +d.get("clientId") : null;
+    }
+    let o = f.dataset.id ? obj(+f.dataset.id) : null;
+    if (o) { Object.assign(o, {name: d.get("name").trim() || o.name, address: (d.get("address") || "").trim(), profile, systems}); if (isProv()) o.clientId = clientId; }
+    else { o = {id: nid(), clientId, name: d.get("name").trim(), address: (d.get("address") || "").trim(), profile, systems, tasks: {}, checklist: {}, journal: [], issues: []}; DB.objects.push(o); }
+    syncTasks(o); save();
+    flash(f.dataset.id ? "Анкета сохранена, график работ и чек-лист пересчитаны" : "Объект создан. Сформированы чек-лист и график регламентных работ.");
+    go(`#/o/${o.id}`);
+  },
+  checklist(f, d) {
+    const o = obj(+f.dataset.id); o.checklist = o.checklist || {};
+    for (const r of checklistRows(o)) {
+      const ans = d.get("a_" + r.no) || null, com = (d.get("c_" + r.no) || "").trim();
+      if (ans !== r.answer || com !== r.comment) o.checklist[r.no] = {answer: ans, comment: com, at: iso(TODAY())};
+      const open = (o.issues || []).find(i => i.clNo === r.no && i.status !== "resolved");
+      if (ans === "no" && !open) addIssue(o, `Чек-лист п. ${r.no}: ${r.text.slice(0, 150)}`, com, "medium", "remark", null, r.no);
+      else if ((ans === "yes" || ans === "na") && open) Object.assign(open, {status: "resolved", resolved: iso(TODAY()), resolution: "Отмечено выполненным в чек-листе"});
+    }
+    save(); flash("Чек-лист сохранён"); route(); window.scrollTo(0, 0);
+  },
+  taskdone(f, d) {
+    const o = obj(+f.dataset.id), code = f.dataset.code, t = TASKS_BY_CODE[code], date = d.get("date");
+    if (!date || date > iso(TODAY())) { flash("Дата не может быть в будущем", "error"); return route(); }
+    const result = d.get("result") || RESULTS[0], note = (d.get("note") || "").trim();
+    o.journal.push({id: nid(), date, task: code, system: t.system || "", type: "Плановая работа", desc: t.title + (note ? ". " + note : ""),
+                    result, performer: (d.get("performer") || "").trim() || userName(), by: userName()});
+    markDone(o, code, date);
+    if (result === "Неисправно") addIssue(o, "Неисправность: " + t.title, note, "critical");
+    save(); flash(`Отмечено: ${t.title} — ${ruDate(date)}`); route();
+  },
+  taskedit(f, d) {
+    const o = obj(+f.dataset.id), tk = o.tasks[f.dataset.code], per = +d.get("period");
+    tk.side = d.get("side");
+    if (d.has("reset")) tk.custom = false; else if (per >= 1 && per <= 120) { tk.period = per; tk.custom = true; }
+    syncTasks(o); save(); flash("Параметры работы обновлены"); route();
+  },
+  journal(f, d) {
+    const o = obj(+f.dataset.id), date = d.get("date");
+    if (!date || date > iso(TODAY())) { flash("Дата не может быть в будущем", "error"); return route(); }
+    const task = d.get("task") || "", system = d.get("system") || (task ? TASKS_BY_CODE[task].system || "" : ""), result = d.get("result");
+    o.journal.push({id: nid(), date, task, system, type: d.get("type"), desc: (d.get("desc") || "").trim(), result,
+                    performer: (d.get("performer") || "").trim() || userName(), by: userName()});
+    if (task) markDone(o, task, date);
+    if (result === "Неисправно") addIssue(o, "Неисправность: " + (SYSTEMS[system]?.name || d.get("type")), d.get("desc") || "", "critical");
+    save(); flash("Запись добавлена в журнал"); route();
+  },
+  issue(f, d) {
+    const o = obj(+f.dataset.id);
+    addIssue(o, d.get("title").trim(), (d.get("desc") || "").trim(), d.get("severity"), isProv() ? "remark" : "request", d.get("due") || null);
+    save(); flash(isProv() ? "Замечание добавлено" : "Заявка отправлена обслуживающей организации"); route();
+  },
+  issueupd(f, d) {
+    const o = obj(+f.dataset.id), i = o.issues.find(x => x.id === +f.dataset.iid);
+    i.status = d.get("status"); const r = (d.get("resolution") || "").trim(); if (r) i.resolution = r;
+    i.resolved = i.status === "resolved" ? iso(TODAY()) : null;
+    save(); flash("Статус обновлён"); route();
+  },
+  client(f, d) {
+    DB.clients.push({id: nid(), name: d.get("name").trim(), inn: d.get("inn"), contact: d.get("contact"), phone: d.get("phone")});
+    save(); flash("Организация добавлена"); route();
+  },
+};
+document.addEventListener("submit", e => {
+  const f = e.target.closest("form[data-form]"); if (!f) return;
+  e.preventDefault(); FORMS[f.dataset.form](f, new FormData(f));
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.dataset.act === "role") {
+    ROLE = el.value === "p" ? {mode: "provider"} : {mode: "client", clientId: +el.value};
+    localStorage.setItem(ROLE_KEY, JSON.stringify(ROLE));
+    flash(isProv() ? "Вы вошли как обслуживающая организация" : "Вы вошли как эксплуатант: " + client(ROLE.clientId).name);
+    go("#/");
+  }
+  if (el.dataset.act === "import" && el.files[0]) {
+    const rd = new FileReader();
+    rd.onload = () => { try { const x = JSON.parse(rd.result); if (!x.objects) throw 0; DB = x; save(); flash("Данные загружены"); go("#/"); }
+                        catch (err) { flash("Это не файл данных «Мониторинга»", "error"); route(); } };
+    rd.readAsText(el.files[0]);
+  }
+});
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if (!el || el.tagName === "SELECT" || el.tagName === "INPUT") return;
+  const act = el.dataset.act;
+  if (act === "export") {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 1)], {type: "application/json"}));
+    a.download = `monitoring-demo-${iso(TODAY())}.json`; a.click();
+  }
+  if (act === "reset" && confirm("Удалить все внесённые данные и вернуть демо-объекты?")) { DB = seed(); save(); flash("Демо-данные восстановлены"); go("#/"); }
+  if (act === "archive" && confirm("Перенести объект в архив?")) { obj(+el.dataset.id).archived = true; save(); flash("Объект в архиве"); go("#/"); }
+});
+window.addEventListener("hashchange", route);
+load(); route();
+
+</script></body></html>
