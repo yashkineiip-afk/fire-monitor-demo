@@ -166,12 +166,22 @@ details summary { cursor: pointer; color: var(--accent); font-size: .88rem; }
   .nav a { white-space: nowrap; }
   .who { order: 2; }
 }
+.tbl td:first-child { min-width: 180px; }
+.opans { display: flex; gap: .25rem; }
+.opans label { margin: 0; flex: 1; text-align: center; border: 1px solid #cfcac0; border-radius: 6px; padding: .3rem 0; cursor: pointer; color: var(--ink); font-size: .8rem; }
+.opans input { display: none; }
+.opans label:has(input[value=ok]:checked) { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 700; }
+.opans label:has(input[value=defect]:checked) { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 700; }
+.opans label:has(input[value=skip]:checked) { background: var(--gray-bg); border-color: var(--gray); font-weight: 700; }
+.tbl tfoot td { border-top: 2px solid var(--line); background: #faf9f6; }
 
 </style></head>
 <body><div id="app"></div>
 <script>
+const MT = {"OPS": {"aps": [["aps_ppkp_insp", "Осмотр ППКП: индикация дежурного режима, журнал событий прибора, неисправности и отключения, повреждения корпусов", 1, "ГОСТ Р 59638-2021, табл. 1, прил. Г.4"], ["aps_ibe_insp", "Осмотр источников бесперебойного электропитания: индикация дежурного режима", 1, "ГОСТ Р 59638-2021, табл. 1, прил. Г.3"], ["aps_ppkp_func", "Контроль функционирования ППКП и функциональных модулей", 3, "ГОСТ Р 59638-2021, табл. 1"], ["aps_ibe_func", "Контроль функционирования ИБЭ: переход на резервное питание, состояние АКБ (клеммы, коррозия, электролит, корпус)", 6, "ГОСТ Р 59638-2021, табл. 1"], ["aps_ip_insp", "Осмотр извещателей и выносных индикаторов: маркировка, нет окраски и повреждений, нет перепланировок, свободно 0,5 м вокруг ИП; ручные ИП не загромождены", 6, "ГОСТ Р 59638-2021, табл. 1, прил. Г.1–Г.2"], ["aps_ip_func", "Контроль функционирования извещателей (проверка срабатывания)", 12, "ГОСТ Р 59638-2021, табл. 1"], ["aps_io", "Осмотр и контроль функционирования модулей ввода/вывода", 12, "ГОСТ Р 59638-2021, табл. 1, прил. Г.5"], ["aps_complex", "Комплексные испытания на работоспособность СПС с актом (не более 15 мес. между испытаниями)", 12, "ГОСТ Р 59638-2021, табл. 1, прил. Б, В"], ["aps_akb", "Замена АКБ (ёмкость < 80 % номинальной или срок до 10 лет)", 0, "ГОСТ Р 59638-2021, п. 6.6"], ["aps_faults", "Устранение неисправностей и ложных срабатываний, восстановление дежурного режима", 0, "ГОСТ Р 59638-2021, табл. 1"]], "soue": [["soue_clean", "Обслуживание световых, звуковых и речевых оповещателей: очистка, протирка", 3, "ГОСТ Р 59639-2021, табл. 1"], ["soue_power", "Проверка основного и резервного питания, автоматического переключения с основного ввода на резервный и обратно", 3, "ГОСТ Р 59639-2021, табл. 1"], ["soue_comp", "Проверка работоспособности отдельных компонентов (не менее 25 % за квартал, каждый квартал — разные)", 3, "ГОСТ Р 59639-2021, п. 6.6.1"], ["soue_func", "Проверка работоспособности СОУЭ: запуск, алгоритм и очерёдность, уровень звука, контроль линий (не более 7 мес. между проверками)", 6, "ГОСТ Р 59639-2021, табл. 1, прил. Б"], ["soue_replace", "Замена технических средств и ресурсных элементов (срок службы не более 10 лет)", 0, "ГОСТ Р 59639-2021, п. 6.7.4"]], "aupt_water": [["aw_daily", "Внешний осмотр трубопроводов и узлов, показания приборов, положение запорных устройств (дежурный персонал)", -1, "ГОСТ Р 59636-2021, прил. В"], ["aw_weekly", "Питание основное/резервное и автопереключение, узлы управления, насосная установка, компрессор", -2, "ГОСТ Р 59636-2021, прил. В"], ["aw_cmd", "Проверка выдачи команд при срабатывании: сигнализация, оповещение, вентиляция и дымоудаление, технологическое оборудование", 1, "ГОСТ Р 59636-2021, прил. В"], ["aw_fault", "Проверка сигнализации о неисправности АУП и её технических средств", 1, "ГОСТ Р 59636-2021, прил. В"], ["aw_tank", "Проверка работоспособности гидропневматического бака", 1, "ГОСТ Р 59636-2021, прил. В"], ["aw_docs", "Наличие документации, схем, табличек и шильдиков на посту, в насосной, на запорных устройствах", 1, "ГОСТ Р 59636-2021, прил. В"], ["aw_fix", "Проверка прочности крепления технических средств и трубопроводов", 1, "ГОСТ Р 59636-2021, прил. В"], ["aw_manual", "Проверка работоспособности при ручном (местном, дистанционном) пуске без подачи воды через ороситель", 3, "ГОСТ Р 59636-2021, прил. В"], ["aw_valves", "Проверка всех запорных устройств (открытие — закрытие), в т.ч. с электроприводом", 3, "ГОСТ Р 59636-2021, прил. В"], ["aw_auto", "Проверка работоспособности в автоматическом режиме без подачи воды через ороситель", 3, "ГОСТ Р 59636-2021, прил. В"], ["aw_sprinklers", "Внешний осмотр оросителей и пеногенераторов, очистка от пыли и грязи", 3, "ГОСТ Р 59636-2021, прил. В"], ["aw_ground", "Проверка сопротивления защитного заземления", 12, "ГОСТ Р 59636-2021, прил. В"], ["aw_flush", "Промывка трубопроводов дренчерных АУП; смена воды в гидробаке и резервуаре", 12, "ГОСТ Р 59636-2021, прил. В"], ["aw_ekm", "Проверка настройки ЭКМ, сигнализаторов давления и расхода; поверка КИП", 12, "ГОСТ Р 59636-2021, прил. В"], ["aw_revision", "Ревизия узлов управления и затворов, сопротивление изоляции, проверка расхода и давления у диктующего оросителя", 36, "ГОСТ Р 59636-2021, прил. В"], ["aw_hydro", "Гидравлические и пневматические испытания трубопроводов (2 года — в агрессивной среде)", 36, "ГОСТ Р 59636-2021, прил. В"]], "aupt_gas": [["ag_insp", "Внешний осмотр: повреждения, загрязнения, крепление, сохранность пломб", 1, "ГОСТ Р 59636-2021, прил. Г"], ["ag_press", "Положение запорной арматуры, давление в побудительной сети и пусковых баллонах", 1, "ГОСТ Р 59636-2021, прил. Г"], ["ag_mass", "Контроль массы ГОТВ и/или давления газа-вытеснителя", 1, "ГОСТ Р 59636-2021, прил. Г"], ["ag_prof", "Профилактические работы", 1, "ГОСТ Р 59636-2021, прил. Г"], ["ag_func", "Проверка работоспособности в ручном и автоматическом режимах без выпуска ОТВ (пиропатроны отключены или имитаторы)", 6, "ГОСТ Р 59636-2021, прил. Г"], ["ag_metro", "Метрологическая проверка контрольно-измерительных приборов", 12, "ГОСТ Р 59636-2021, прил. Г"], ["ag_room", "Соответствие пожарной нагрузки, объёма и герметичности помещений проекту", 12, "ГОСТ Р 59636-2021, прил. Г"], ["ag_hydro", "Гидравлические (пневматические) испытания трубопроводов", 60, "ГОСТ Р 59636-2021, прил. Г"], ["ag_cert", "Техническое освидетельствование АУП", 60, "ГОСТ Р 59636-2021, прил. Г"]], "aupt_powder": [["ap_insp", "Внешний осмотр модулей: повреждения, крепление, пломбы, ориентация модулей и насадков", 1, "ГОСТ Р 59636-2021, прил. Д"], ["ap_press", "Контроль давления газа-вытеснителя (масса — по ТД модуля)", 1, "ГОСТ Р 59636-2021, прил. Д"], ["ap_prof", "Профилактические работы", 1, "ГОСТ Р 59636-2021, прил. Д"], ["ap_powder", "Контроль качества огнетушащего порошка", 0, "ГОСТ Р 59636-2021, прил. Д"], ["ap_func", "Проверка работоспособности в ручном и автоматическом режимах без выпуска ОТВ", 6, "ГОСТ Р 59636-2021, прил. Д"], ["ap_metro", "Метрологическая проверка КИП", 12, "ГОСТ Р 59636-2021, прил. Д"], ["ap_room", "Отсутствие изменений пожарной нагрузки и её затенения", 12, "ГОСТ Р 59636-2021, прил. Д"], ["ap_cert", "Техническое освидетельствование АУП", 60, "ГОСТ Р 59636-2021, прил. Д"]], "aupt_aerosol": [["aa_insp", "Внешний осмотр генераторов, узлов пуска и проводки: целостность, коррозия, крепление, пломбы", 1, "ГОСТ Р 59636-2021, прил. Е"], ["aa_prof", "Профилактические работы", 1, "ГОСТ Р 59636-2021, прил. Е"], ["aa_func", "Проверка работоспособности в ручном и автоматическом режимах без пуска генераторов", 6, "ГОСТ Р 59636-2021, прил. Е"], ["aa_metro", "Метрологическая проверка КИП", 12, "ГОСТ Р 59636-2021, прил. Е"], ["aa_room", "Отсутствие изменений пожарной нагрузки, объёма и герметичности помещений", 12, "ГОСТ Р 59636-2021, прил. Е"], ["aa_cert", "Техническое освидетельствование АУП", 60, "ГОСТ Р 59636-2021, прил. Е"]], "smoke": [["sm_insp", "Внешний осмотр вентиляторов, клапанов, приводов и шкафов управления; индикация положения клапанов", 1, "ТД изготовителя (рекомендуемая)"], ["sm_dampers", "Проверка срабатывания клапанов дымоудаления и огнезадерживающих клапанов по команде", 3, "ППР п. 42, ТД изготовителя"], ["sm_fans", "Пуск вентиляторов дымоудаления и подпора в ручном и автоматическом режимах", 3, "ТД изготовителя (рекомендуемая)"], ["sm_complex", "Совместная проверка с АПС (комплексные испытания) и периодические испытания с замером параметров", 12, "ГОСТ Р 53300-2009"]], "monitoring": [["mon_insp", "Внешний осмотр объектовой станции, антенны, кабелей", 1, "ТД изготовителя"], ["mon_test", "Передача тестового извещения на пульт пожарной охраны, проверка прохождения", 1, "ч. 7 ст. 83 123-ФЗ, ТД изготовителя"], ["mon_power", "Проверка резервного питания и канала связи", 1, "ТД изготовителя"]], "vpv": [["vpv_month", "Внешний осмотр и очистка, показания приборов, проверка запорных устройств, резервного питания", 1, "ГОСТ Р 59643-2021, прил. А"], ["vpv_water", "Проверка работоспособности пожарных кранов на водоотдачу с актом (весна и осень)", 6, "ППР п. 50, ГОСТ Р 59643-2021, прил. А"], ["vpv_cabinets", "Комплектность пожарных шкафов: рукав, ствол, головки, пломбы, обозначения", 6, "ГОСТ Р 59643-2021, прил. А"], ["vpv_roll", "Перекатка пожарных рукавов на новую скатку", 12, "ППР п. 50, ГОСТ Р 59643-2021, прил. А"], ["vpv_year", "Сопротивление заземления, промывка трубопроводов, поверка КИП", 12, "ГОСТ Р 59643-2021, прил. А"], ["vpv_3y", "Замена воды в ёмкостях, сопротивление изоляции, гидро- и пневмоиспытания трубопроводов", 36, "ГОСТ Р 59643-2021, прил. А"]], "pumps": [["pump_start", "Пробный пуск пожарных насосных агрегатов", 1, "ППР п. 52"], ["pump_switch", "Проверка автоматического, дистанционного и ручного пуска; переход на резервный насос и резервный ввод", 1, "ГОСТ Р 59643-2021, прил. А"], ["pump_room", "Осмотр насосной: схема, инструкции, таблички, освещение, телефон", 1, "ГОСТ Р 59643-2021, прил. А"], ["pump_valves", "Проверка задвижек с электроприводом", 6, "ППР п. 52"]], "outer_water": [["ow_test", "Проверка работоспособности гидрантов (водоёма) с пуском воды, акт", 6, "ППР п. 48"], ["ow_wells", "Осмотр колодцев: крышки, отсутствие воды и льда, доступ и подъезд", 6, "ППР п. 48"], ["ow_signs", "Наличие и исправность указателей с расстоянием (светоотражающих или световых)", 6, "ППР п. 48"], ["ow_winter", "Подготовка к зиме: утепление колодцев, откачка воды", 12, "СП 8.13130 (рекомендуемая)"]], "extinguishers": [["ext_look", "Осмотр: наличие на местах, пломба, давление по манометру, доступность, сроки перезарядки", 3, "ГОСТ Р 59641-2021, п. 5.1 (рекомендуемая)"], ["ext_tech", "Ежегодная проверка: корпус, ЗПУ, покрытие, инструкция, манометр, клеймо, масса, шланг и насадок, крепление", 12, "ГОСТ Р 59641-2021, п. 5.1.7"], ["ext_leak", "Визуальная проверка утечки вытесняющего газа", 12, "ГОСТ Р 59641-2021, п. 5.1.7"], ["ext_open", "Вскрытие не менее 3 % порошковых (не менее 1 шт.): сыпучесть, комки, влага; при отклонении — перезарядка всей марки", 12, "ГОСТ Р 59641-2021, п. 5.1.7"], ["ext_recharge_op", "Перезарядка по паспорту или по результатам проверки", 60, "ППР п. 60"], ["ext_journal", "Записи в журнале ТО огнетушителей, бирки", 12, "ГОСТ Р 59641-2021, прил. А"]], "fireproof": [["fp_visual", "Визуальный осмотр покрытия: отслоения, трещины, повреждения, увлажнение", 12, "ППР п. 13, ГОСТ Р 59637-2021"], ["fp_thick", "Инструментальный контроль толщины покрытия (краски, мастики)", 12, "ГОСТ Р 59637-2021"], ["fp_quality", "Контроль качества пропитки (древесина, ткани) — отбор проб при необходимости", 12, "ГОСТ Р 59637-2021"], ["fp_act", "Акт проверки состояния огнезащиты, проверка срока службы покрытия", 12, "ППР п. 13"]], "ladders": [["lad_insp", "Осмотр лестниц и ограждений кровли: целостность, коррозия, крепления, сварные швы; очистка от снега и наледи", 12, "ППР п. 17"], ["lad_test", "Эксплуатационные испытания нагрузкой с протоколом", 60, "ППР п. 17, ГОСТ Р 53254-2009"]], "fire_doors": [["door_close", "Самозакрывание (доводчики), плотный притвор, отсутствие клиньев и подпорок", 3, "ППР п. 14, ГОСТ Р 59642-2021"], ["door_seal", "Состояние уплотнителей (в т.ч. терморасширяющихся), фурнитуры, «антипаники»", 3, "ГОСТ Р 59642-2021"], ["door_mark", "Маркировка (шильдик), отсутствие самовольных изменений конструкции", 12, "ГОСТ Р 59642-2021"]], "emergency_light": [["el_auto", "Автоматическое переключение на аварийное питание", 6, "ТД изготовителя (рекомендуемая)"], ["el_battery", "Работа светильников и знаков «Выход» от встроенных АКБ, замена ламп и АКБ", 6, "ТД изготовителя (рекомендуемая)"]]}, "TASK_OPS": {"aps_to": "aps", "soue_to": "soue", "aupt_to": "aupt", "smoke_to": "smoke", "monitoring_to": "monitoring", "vpv_to": "vpv", "vpv_check": "vpv", "vpv_hoses": "vpv", "pumps_check": "pumps", "valves_check": "pumps", "outer_water_check": "outer_water", "ext_inspect": "extinguishers", "ext_annual": "extinguishers", "ext_recharge": "extinguishers", "fireproof_check": "fireproof", "ladders_inspect": "ladders", "ladders_test": "ladders", "fire_doors_check": "fire_doors", "emergency_light_check": "emergency_light"}, "AUPT_GROUPS": {"Газовое": "aupt_gas", "Порошковое": "aupt_powder", "Аэрозольное": "aupt_aerosol"}, "OP_TASK": {"vpv_water": "vpv_check", "vpv_roll": "vpv_hoses", "vpv_month": "vpv_to", "pump_start": "pumps_check", "pump_valves": "valves_check", "ext_look": "ext_inspect", "ext_tech": "ext_annual", "ext_recharge_op": "ext_recharge", "lad_insp": "ladders_inspect", "lad_test": "ladders_test", "fp_act": "fireproof_check", "door_close": "fire_doors_check", "el_auto": "emergency_light_check", "ow_test": "outer_water_check", "sm_dampers": "dampers_check"}, "PRICES": [{"code": "aps", "task": "aps_to", "title": "ТО пожарной сигнализации (абонентская плата)", "qty": "aps_devices", "unit": "устройств", "kind": "tier", "tiers": [[10, 1650, 5000], [20, 2650, 8500], [30, 3650, 12000], [50, 4400, 18000], [100, 7700, 26000], [200, 9500, 38000]], "step": 50, "extra": [1000, 5000]}, {"code": "soue", "task": "soue_to", "title": "ТО системы оповещения (СОУЭ)", "qty": "soue_units", "unit": "оповещателей", "kind": "unit", "min": 50, "max": 140, "min_charge": [1000, 2500], "est": true}, {"code": "aupt_water", "task": "aupt_to", "title": "ТО водяного (пенного) пожаротушения", "qty": "aupt_area", "unit": "м² защищаемой площади", "kind": "tier", "when": "aupt_water", "tiers": [[1000, 9950, 15450], [3000, 12000, 19900], [10000, 18000, 29900]], "step": 5000, "extra": [6000, 10000]}, {"code": "aupt_mod", "task": "aupt_to", "title": "ТО модульного пожаротушения (газ, порошок, аэрозоль)", "qty": "aupt_modules", "unit": "модулей", "kind": "tier", "when": "aupt_modules", "tiers": [[10, 3000, 5000], [30, 5000, 8000], [50, 6000, 10000], [100, 9000, 15000]], "step": 50, "extra": [4000, 7000]}, {"code": "smoke", "task": "smoke_to", "title": "ТО противодымной вентиляции", "qty": "smoke_units", "unit": "вентиляторов и клапанов", "kind": "unit", "min": 200, "max": 600, "min_charge": [2000, 5000], "est": true}, {"code": "monitoring", "task": "monitoring_to", "title": "ТО ПАК вывода сигнала на пульт", "qty": "one", "unit": "станция", "kind": "fixed", "min": 3700, "max": 7000}, {"code": "vpv_to", "task": "vpv_to", "title": "Ежемесячное ТО ВПВ", "qty": "one", "unit": "система", "kind": "fixed", "min": 1500, "max": 4000, "est": true}, {"code": "vpv_check", "task": "vpv_check", "title": "Проверка пожарных кранов на водоотдачу", "qty": "vpv_cranes", "unit": "кранов", "kind": "unit", "min": 350, "max": 900}, {"code": "vpv_hoses", "task": "vpv_hoses", "title": "Перекатка пожарных рукавов", "qty": "vpv_cranes", "unit": "рукавов", "kind": "unit", "min": 100, "max": 500}, {"code": "pumps", "task": "pumps_check", "title": "Проверка пожарных насосов", "qty": "pump_units", "unit": "агрегатов", "kind": "unit", "min": 500, "max": 1500}, {"code": "outer_water", "task": "outer_water_check", "title": "Проверка гидрантов / водоёмов", "qty": "hydrants", "unit": "источников", "kind": "unit", "min": 1500, "max": 7000}, {"code": "ext_annual", "task": "ext_annual", "title": "Ежегодное ТО огнетушителей", "qty": "ext_count", "unit": "огнетушителей", "kind": "unit", "min": 100, "max": 300}, {"code": "ext_recharge", "task": "ext_recharge", "title": "Перезарядка огнетушителей (ОП-4/5)", "qty": "ext_count", "unit": "огнетушителей", "kind": "unit", "min": 130, "max": 400}, {"code": "fireproof", "task": "fireproof_check", "title": "Проверка качества огнезащиты (лаборатория, акт)", "qty": "fireproof_area", "unit": "м² обработки", "kind": "base_area", "base": [10000, 22500], "upto": 1000, "step": 1000, "extra": [3000, 7500]}, {"code": "ladders_test", "task": "ladders_test", "title": "Испытания пожарных лестниц и ограждений кровли", "qty": "ladders", "unit": "лестниц", "kind": "unit", "min": 5000, "max": 15000}, {"code": "ladders_inspect", "task": "ladders_inspect", "title": "Обследование наружных лестниц", "qty": "ladders", "unit": "лестниц", "kind": "unit", "min": 500, "max": 3000}, {"code": "elight", "task": "emergency_light_check", "title": "Проверка аварийного освещения", "qty": "elight", "unit": "светильников", "kind": "unit", "min": 30, "max": 100, "min_charge": [1000, 3000], "est": true}, {"code": "dampers", "task": "dampers_check", "title": "Проверка огнезадерживающих клапанов", "qty": "ozk", "unit": "клапанов", "kind": "unit", "min": 300, "max": 800, "est": true}, {"code": "over_life", "task": "over_life_test", "title": "Испытания систем сверх срока службы", "qty": "old_systems", "unit": "систем", "kind": "unit", "min": 15000, "max": 50000, "est": true}], "NOT_PRICED": {"instr_repeat": "силами эксплуатанта", "evac_drill": "силами эксплуатанта", "sizod_check": "силами эксплуатанта", "ext_inspect": "силами эксплуатанта", "fire_doors_check": "силами эксплуатанта", "spz_plan": "входит в договор ТО", "valves_check": "входит в ТО насосной", "vent_clean": "по смете (зависит от длины воздуховодов)", "chimney_clean": "по смете"}, "PRICES_NOTE": "Ориентировочный бюджет по открытым прайсам обслуживающих организаций Москвы и МО (2025–2026), диапазон «от — до». Не включает ремонт, замену оборудования и ЗИП, стоимость работ по договору уточняется после обследования. Для регионов задайте поправочный коэффициент.", "PERIOD_LABELS": {"-1": "ежедневно", "-2": "еженедельно", "0": "по ТД / при необходимости"}};
+
 // ===== Нормативная база (копия norms.py полной версии) =====
-const NORMS_NOTE = "Нормативная база: ППР в РФ (ПП РФ № 1479, действуют по 31.12.2026), 123-ФЗ, приказ МЧС № 1120, ГОСТ Р 59637-2021, ГОСТ Р 59641-2021. С 2027 г. правила утверждает МЧС России — номера пунктов изменятся.";
+const NORMS_NOTE = "Нормативная база: ППР в РФ (ПП РФ № 1479, действуют по 31.12.2026), 123-ФЗ, приказ МЧС № 1120, ГОСТ Р 59636…59643-2021. С 2027 г. правила утверждает МЧС России — номера пунктов изменятся.";
 
 const FCLASSES = [
   ["Ф1.1","Детские сады, больницы, дома престарелых, спальные корпуса интернатов"],
@@ -222,6 +232,7 @@ const QUESTIONNAIRE = [
     {key:"stu",label:"Есть специальные технические условия (СТУ)",type:"bool"},
     {key:"facade_banners",label:"На фасаде есть баннеры, транспаранты, конструкции",type:"bool"},
     {key:"smoking_place",label:"Есть отведённое место для курения",type:"bool"},
+    {key:"price_coef",label:"Поправочный коэффициент к ценам ТО",type:"number",hint:"1 — цены Москвы; для регионов обычно 0,6–0,9; для сложных объектов — больше 1"},
     {key:"notes",label:"Примечания",type:"textarea"},
   ]},
 ];
@@ -232,11 +243,11 @@ const SYSTEMS = {
     {key:"kind",label:"Тип",type:"select",options:["Адресная","Адресно-аналоговая","Пороговая"]},
     {key:"brand",label:"Оборудование (марка ППКП)",type:"text"},{key:"detectors",label:"Кол-во извещателей",type:"number"},...LIFE]},
   soue:{name:"Система оповещения и управления эвакуацией (СОУЭ)",spz:true,fields:[
-    {key:"type",label:"Тип СОУЭ",type:"select",options:["1","2","3","4","5"]},{key:"brand",label:"Оборудование",type:"text"},...LIFE]},
+    {key:"type",label:"Тип СОУЭ",type:"select",options:["1","2","3","4","5"]},{key:"brand",label:"Оборудование",type:"text"},{key:"units",label:"Кол-во оповещателей",type:"number"},...LIFE]},
   aupt:{name:"Автоматическая установка пожаротушения (АУПТ)",spz:true,fields:[
     {key:"kind",label:"Вид",type:"select",options:["Водяное спринклерное","Водяное дренчерное","Тонкораспылённая вода","Газовое","Порошковое","Аэрозольное","Пенное"]},
-    {key:"rooms",label:"Защищаемые помещения",type:"text"},...LIFE]},
-  smoke:{name:"Противодымная вентиляция (дымоудаление, подпор)",spz:true,fields:[{key:"kind",label:"Состав",type:"text",hint:"дымоудаление, подпор, клапаны"},...LIFE]},
+    {key:"rooms",label:"Защищаемые помещения",type:"text"},{key:"area",label:"Защищаемая площадь, м²",type:"number"},{key:"modules",label:"Кол-во модулей / баллонов (газ, порошок, аэрозоль)",type:"number"},...LIFE]},
+  smoke:{name:"Противодымная вентиляция (дымоудаление, подпор)",spz:true,fields:[{key:"kind",label:"Состав",type:"text",hint:"дымоудаление, подпор, клапаны"},{key:"units",label:"Кол-во вентиляторов и клапанов",type:"number"},...LIFE]},
   monitoring:{name:"Вывод сигнала на пульт пожарной охраны (ПАК)",spz:true,fields:[{key:"brand",label:"Оборудование / оператор",type:"text",hint:"например, ПАК «Стрелец-Мониторинг»"},...LIFE]},
   vpv:{name:"Внутренний противопожарный водопровод (ВПВ)",spz:true,fields:[{key:"cranes",label:"Кол-во пожарных кранов",type:"number"}]},
   pumps:{name:"Пожарная насосная станция / задвижки с электроприводом",spz:true,fields:[{key:"units",label:"Кол-во насосных агрегатов",type:"number"}]},
@@ -247,10 +258,10 @@ const SYSTEMS = {
   fire_doors:{name:"Противопожарные двери, ворота, люки, окна",spz:false,fields:[{key:"count",label:"Количество",type:"number"}]},
   emergency_light:{name:"Аварийное (эвакуационное) освещение",spz:false,fields:[{key:"count",label:"Кол-во светильников",type:"number"}]},
   fireproof:{name:"Огнезащитная обработка конструкций",spz:false,fields:[
-    {key:"what",label:"Что обработано",type:"text",hint:"металлоконструкции, деревянная кровля..."},{key:"agent",label:"Огнезащитный состав",type:"text"},
+    {key:"what",label:"Что обработано",type:"text",hint:"металлоконструкции, деревянная кровля..."},{key:"agent",label:"Огнезащитный состав",type:"text"},{key:"area",label:"Площадь обработки, м²",type:"number"},
     {key:"year",label:"Год обработки",type:"number"},{key:"life",label:"Срок службы покрытия, лет",type:"number"}]},
   ladders:{name:"Наружные пожарные лестницы и ограждения кровли",spz:false,fields:[{key:"count",label:"Кол-во лестниц",type:"number"}]},
-  ventilation:{name:"Общеобменная вентиляция",spz:false,fields:[{key:"ozk",label:"Есть огнезадерживающие клапаны",type:"bool"}]},
+  ventilation:{name:"Общеобменная вентиляция",spz:false,fields:[{key:"ozk",label:"Есть огнезадерживающие клапаны",type:"bool"},{key:"ozk_count",label:"Кол-во огнезадерживающих клапанов",type:"number"}]},
   stove:{name:"Печное отопление / кухонные плиты на твёрдом топливе",spz:false,fields:[{key:"continuous",label:"Непрерывная топка",type:"bool"}]},
 };
 
@@ -280,6 +291,7 @@ const TASKS = [
   {code:"smoke_to",title:"Регламентное ТО противодымной вентиляции",period:1,side:"provider",ref:"ППР п. 54, регламент изготовителя",system:"smoke",applies:(p,s)=>has(s,"smoke")},
   {code:"monitoring_to",title:"ТО оборудования вывода сигнала на пульт пожарной охраны",period:1,side:"provider",ref:"ППР п. 54; ч. 7 ст. 83 123-ФЗ",system:"monitoring",applies:(p,s)=>has(s,"monitoring")},
   {code:"over_life_test",title:"Ежегодные испытания систем, эксплуатируемых сверх срока службы",period:12,side:"provider",ref:"ППР п. 54",hint:"Система определяет по году ввода и сроку службы из анкеты",applies:(p,s,y)=>overLife(s,y).length>0},
+  {code:"vpv_to",title:"Регламентное ТО ВПВ (осмотр, запорная арматура, приборы)",period:1,side:"provider",ref:"ППР п. 54, ГОСТ Р 59643-2021",system:"vpv",applies:(p,s)=>has(s,"vpv")},
   {code:"vpv_check",title:"Проверка работоспособности ВПВ с актом (весна и осень)",period:6,side:"provider",ref:"ППР п. 50",system:"vpv",applies:(p,s)=>has(s,"vpv")},
   {code:"vpv_hoses",title:"Перекатка пожарных рукавов",period:12,side:"provider",ref:"ППР п. 50",system:"vpv",applies:(p,s)=>has(s,"vpv")},
   {code:"pumps_check",title:"Проверка пожарных насосных агрегатов",period:1,side:"provider",ref:"ППР п. 52",system:"pumps",applies:(p,s)=>has(s,"pumps")},
@@ -353,6 +365,114 @@ function normWarnings(p, s, y) {
   return out;
 }
 
+// ===== Регламенты ТО по ГОСТ и бюджет (логика; данные — MT из maintenance.py) =====
+function mtPeriodLabel(m) {
+  if (MT.PERIOD_LABELS[String(m)]) return MT.PERIOD_LABELS[String(m)];
+  return ({1:"ежемесячно", 3:"раз в квартал", 6:"раз в полгода", 12:"раз в год", 36:"раз в 3 года", 60:"раз в 5 лет"})[m] || `раз в ${m} мес.`;
+}
+function opsKey(sys, s) { return sys === "aupt" ? (MT.AUPT_GROUPS[(s.aupt || {}).kind || ""] || "aupt_water") : sys; }
+function opsForTask(code, s) {
+  const sc = MT.TASK_OPS[code];
+  if (!sc || !(sc in s)) return [null, []];
+  const key = opsKey(sc, s); return [key, MT.OPS[key] || []];
+}
+const OP_TEXT = {}; for (const ops of Object.values(MT.OPS)) for (const [c, t, , r] of ops) OP_TEXT[c] = [t, r];
+const OP_STATUS = {ok: "Выполнено, норма", defect: "Выявлена неисправность", skip: "Не выполнялось"};
+
+function opsLastDone(o) {
+  const last = {};
+  for (const j of o.journal || []) for (const op of j.ops || [])
+    if (op.status !== "skip" && (!last[op.code] || last[op.code] < j.date)) last[op.code] = j.date;
+  return last;
+}
+function opsStatus(ops, last) {
+  const today = TODAY();
+  return ops.map(([code, text, per, ref]) => {
+    const l = last[code]; let status, due = null;
+    if (per <= 0) status = "info";
+    else if (!l) status = "nodata";
+    else { due = addMonths(parse(l), per); const d = days(due, today); status = d < 0 ? "overdue" : d <= (per <= 1 ? 7 : 30) ? "soon" : "ok"; }
+    return {code, text, period: per, periodLabel: mtPeriodLabel(per), ref, last: l || null, due: due ? iso(due) : null, status};
+  });
+}
+function regulations(o) {
+  const last = opsLastDone(o), out = [], seen = new Set();
+  for (const code of Object.keys(o.systems)) {
+    if (!SYSTEMS[code]) continue;
+    const key = opsKey(code, o.systems); if (seen.has(key) || !MT.OPS[key]) continue; seen.add(key);
+    const rows = opsStatus(MT.OPS[key], last);
+    out.push({system: code, key, name: SYSTEMS[code].name, ops: rows,
+              overdue: rows.filter(r => r.status === "overdue").length, nodata: rows.filter(r => r.status === "nodata").length});
+  }
+  return out;
+}
+
+function quantity(key, p, s, oldSystems) {
+  const area = num(p.area_m2), g = (sys, k) => num((s[sys] || {})[k]);
+  const r = (v, est) => [v, est];
+  switch (key) {
+    case "one": return r(1, false);
+    case "aps_devices": return g("aps","detectors") ? r(g("aps","detectors"), false) : r(Math.max(5, Math.round(area / 25)), true);
+    case "soue_units": return g("soue","units") ? r(g("soue","units"), false) : r(Math.max(2, Math.round(area / 80)), true);
+    case "aupt_area": return g("aupt","area") ? r(g("aupt","area"), false) : r(area || 500, true);
+    case "aupt_modules": return g("aupt","modules") ? r(g("aupt","modules"), false) : r(Math.max(2, Math.round((g("aupt","area") || area || 200) / 50)), true);
+    case "smoke_units": return g("smoke","units") ? r(g("smoke","units"), false) : r(4, true);
+    case "vpv_cranes": return g("vpv","cranes") ? r(g("vpv","cranes"), false) : r(Math.max(2, Math.round(area / 800)), true);
+    case "pump_units": return g("pumps","units") ? r(g("pumps","units"), false) : r(2, true);
+    case "hydrants": return g("outer_water","count") ? r(g("outer_water","count"), false) : r(1, true);
+    case "ext_count": return g("extinguishers","count") ? r(g("extinguishers","count"), false) : r(Math.max(2, Math.round(area / 100)), true);
+    case "fireproof_area": return g("fireproof","area") ? r(g("fireproof","area"), false) : r(1000, true);
+    case "ladders": return g("ladders","count") ? r(g("ladders","count"), false) : r(1, true);
+    case "elight": return g("emergency_light","count") ? r(g("emergency_light","count"), false) : r(Math.max(4, Math.round(area / 50)), true);
+    case "ozk": return g("ventilation","ozk_count") ? r(g("ventilation","ozk_count"), false) : r(2, true);
+    case "old_systems": return r(oldSystems, false);
+  }
+  return r(0, false);
+}
+function pricePerEvent(it, qty, mult) {
+  let lo = 0, hi = 0;
+  if (it.kind === "fixed") { lo = it.min; hi = it.max; }
+  else if (it.kind === "unit") {
+    lo = qty * it.min; hi = qty * it.max;
+    if (it.min_charge) { lo = Math.max(lo, it.min_charge[0]); hi = Math.max(hi, it.min_charge[1]); }
+  } else if (it.kind === "tier") {
+    const t = it.tiers.find(([upto]) => qty <= upto);
+    if (t) { lo = t[1]; hi = t[2]; }
+    else { const [u, a, b] = it.tiers[it.tiers.length - 1], st = Math.ceil((qty - u) / it.step); lo = a + st * it.extra[0]; hi = b + st * it.extra[1]; }
+  } else if (it.kind === "base_area") {
+    const st = Math.max(0, Math.ceil((qty - it.upto) / it.step)); lo = it.base[0] + st * it.extra[0]; hi = it.base[1] + st * it.extra[1];
+  }
+  return [lo * mult, hi * mult];
+}
+function priceItems() {
+  const ov = (DB.prices && DB.prices.items) || {};
+  return MT.PRICES.map(it => {
+    const x = {...it}, o = ov[it.code] || {};
+    if (["unit", "fixed"].includes(it.kind)) { if (o.min != null) x.min = o.min; if (o.max != null) x.max = o.max; x.mult = 1; }
+    else x.mult = o.mult != null ? o.mult : 1;
+    return x;
+  });
+}
+function budget(o) {
+  const p = o.profile, s = o.systems, coef = (num(p.price_coef) || 1) * ((DB.prices && DB.prices.coef) || 1);
+  const rows = taskRows(o), byTask = Object.fromEntries(rows.map(t => [t.code, t]));
+  const ak = "aupt" in s ? opsKey("aupt", s) : null, old = overLife(s, TODAY().getFullYear()).length;
+  const lines = [], skipped = [];
+  for (const it of priceItems()) {
+    const t = byTask[it.task]; if (!t) continue;
+    if (it.when === "aupt_water" && ak !== "aupt_water") continue;
+    if (it.when === "aupt_modules" && (!ak || ak === "aupt_water")) continue;
+    const [qty, est] = quantity(it.qty, p, s, old); if (!qty) continue;
+    const perYear = 12 / Math.max(1, t.period), [lo, hi] = pricePerEvent(it, qty, it.mult);
+    lines.push({title: it.title, qty, est, unit: it.unit, perYear, eMin: lo * coef, eMax: hi * coef,
+                yMin: lo * coef * perYear, yMax: hi * coef * perYear, priceEst: !!it.est});
+  }
+  rows.forEach(t => { if (MT.NOT_PRICED[t.code]) skipped.push([t.title, MT.NOT_PRICED[t.code]]); });
+  const yMin = lines.reduce((a, l) => a + l.yMin, 0), yMax = lines.reduce((a, l) => a + l.yMax, 0);
+  return {lines, skipped, yMin, yMax, coef};
+}
+const rub = v => Math.round(v).toLocaleString("ru-RU") + " ₽";
+
 // ===== Демо-версия «Мониторинг ПБ»: все данные хранятся в браузере =====
 const KEY = "firemon_demo_v1", ROLE_KEY = "firemon_demo_role";
 const SIDE = {client:"Эксплуатант", provider:"Обслуживающая организация"};
@@ -389,6 +509,8 @@ let DB, ROLE;
 function load() {
   try { DB = JSON.parse(localStorage.getItem(KEY)); } catch (e) { DB = null; }
   if (!DB || !DB.objects) { DB = seed(); save(); }
+  if (!DB.prices) DB.prices = {coef: 1, items: {}};
+  DB.objects.forEach(syncTasks); save();
   try { ROLE = JSON.parse(localStorage.getItem(ROLE_KEY)); } catch (e) { ROLE = null; }
   if (!ROLE) ROLE = {mode:"provider"};
 }
@@ -450,7 +572,7 @@ function markDone(o, code, date) { const t = o.tasks[code]; if (t && (!t.last ||
 
 // ---------- демо-данные ----------
 function seed() {
-  const db = {v: 1, seq: 100, clients: [], objects: []};
+  const db = {v: 1, seq: 5000, clients: [], objects: [], prices: {coef: 1, items: {}}};
   db.clients.push({id: 1, name: "ООО «Бизнес-Парк Север»", inn: "7700000000", contact: "Иванов И. И.", phone: "+7 900 000-00-00"});
   db.clients.push({id: 2, name: "ИП Смирнова А. В. (арендатор)", contact: "Смирнова А. В."});
   const ago = n => { const d = TODAY(); d.setDate(d.getDate() - n); return iso(d); };
@@ -459,18 +581,18 @@ function seed() {
       responsible_phone:"+7 900 000-00-00", fclass:"Ф4.3 — Органы управления, офисы, банки, НИИ, редакции", floors:"9", underground:"1",
       height_m:"28", area_m2:"12500", fire_resistance:"II", constr_class:"С0", year_built:"2012", max_people:"600", workplaces10:true,
       night_stay:true, mgn:true, declaration:"Да", facade_banners:true, smoking_place:true},
-    systems: {aps:{kind:"Адресная", brand:"Рубеж-2ОП", detectors:"840", year:"2012", life:"10"}, soue:{type:"3", brand:"Соната", year:"2012", life:"10"},
-      smoke:{kind:"дымоудаление, подпор", year:"2012", life:"15"}, vpv:{cranes:"36"}, pumps:{units:"2"},
+    systems: {aps:{kind:"Адресная", brand:"Рубеж-2ОП", detectors:"840", year:"2012", life:"10"}, soue:{type:"3", brand:"Соната", units:"160", year:"2012", life:"10"},
+      smoke:{kind:"дымоудаление, подпор", units:"26", year:"2012", life:"15"}, vpv:{cranes:"36"}, pumps:{units:"2"},
       outer_water:{kind:"Пожарные гидранты", count:"2", distance:"80"}, extinguishers:{count:"120", types:"ОП-4, ОУ-3"},
-      fire_doors:{count:"48"}, emergency_light:{count:"210"}, ventilation:{ozk:true}},
+      fire_doors:{count:"48"}, emergency_light:{count:"210"}, ventilation:{ozk:true, ozk_count:"14"}},
     tasks: {}, checklist: {}, journal: [], issues: []};
   const o2 = {id: 12, clientId: 1, name: "Склад №2", address: "Московская обл., г. Химки, Промзона, стр. 5",
     profile: {purpose:"Склад непродовольственных товаров", usage_right:"Арендатор", responsible_name:"Сидоров П. П.",
       fclass:"Ф5.2 — Складские здания, стоянки, архивы, книгохранилища", floors:"1", height_m:"12", area_m2:"4800",
       fire_resistance:"IV", constr_class:"С0", year_built:"2018", max_people:"25", has_prod_storage:true, categories:"В2, В3",
       declaration:"Не знаю", smoking_place:true},
-    systems: {aps:{kind:"Адресно-аналоговая", year:"2018", life:"10"}, aupt:{kind:"Водяное спринклерное", rooms:"складской зал", year:"2018", life:"10"},
-      soue:{type:"2", year:"2018", life:"10"}, extinguishers:{count:"30", types:"ОП-5"}, fireproof:{what:"металлоконструкции", year:"2018", life:"10"},
+    systems: {aps:{kind:"Адресно-аналоговая", year:"2018", life:"10"}, aupt:{kind:"Водяное спринклерное", rooms:"складской зал", area:"4200", year:"2018", life:"10"},
+      soue:{type:"2", year:"2018", life:"10"}, extinguishers:{count:"30", types:"ОП-5"}, fireproof:{what:"металлоконструкции", area:"2600", year:"2018", life:"10"},
       ladders:{count:"2"}},
     tasks: {}, checklist: {}, journal: [], issues: []};
   const o3 = {id: 13, clientId: 2, name: "Детский клуб «Радуга»", address: "г. Москва, ул. Садовая, д. 7, пом. 3",
@@ -496,6 +618,11 @@ function seed() {
   }
   [[1,"yes"],[2,"yes"],[3,"yes"],[4,"yes"],[9,"yes"],[14,"yes"],[16,"no"],[20,"yes"],[29,"yes"],[13,"no"]]
     .forEach(([n, a]) => o1.checklist[n] = {answer: a, comment: "", at: iso(TODAY())});
+  o1.journal.push({id: jid++, date: ago(20), task: "aps_to", system: "aps", type: "Техническое обслуживание",
+    desc: "Регламентное ТО АПС: выполнено операций — 4, неисправностей — 1", result: RESULTS[1], performer: "Инженер Петров", by: "Инженер (демо)",
+    ops: [{code: "aps_ppkp_insp", status: "ok", note: ""}, {code: "aps_ibe_insp", status: "ok", note: ""}, {code: "aps_ppkp_func", status: "ok", note: ""},
+          {code: "aps_ibe_func", status: "defect", note: "АКБ 12 В: 12,4 В — требуется замена"}]});
+  o1.issues.push({id: 2004, title: "АПС: замена АКБ в ИБЭ", desc: "АКБ 12 В: 12,4 В", severity: "medium", status: "open", kind: "remark", created: ago(20), by: "Инженер (демо)"});
   o1.issues.push({id: 2001, title: "Чек-лист п. 16: не заделаны кабельные проходки на 3 этаже", desc: "Кабельный лоток у лифтового холла",
                   severity: "medium", status: "open", kind: "remark", clNo: 16, created: ago(5), by: "Инженер (демо)"});
   o1.issues.push({id: 2002, title: "Чек-лист п. 13: нет документов на баннер фасада", desc: "", severity: "low", status: "open",
@@ -520,7 +647,7 @@ function header() {
   const r = location.hash;
   const nav = [["#/", "Объекты", r === "#/" || r === "" || r.startsWith("#/o/")], ["#/plan", "План-график", r === "#/plan"],
     ["#/issues", "Замечания и заявки", r === "#/issues"]];
-  if (isProv()) nav.push(["#/clients", "Эксплуатанты", r === "#/clients"]);
+  if (isProv()) nav.push(["#/clients", "Эксплуатанты", r === "#/clients"], ["#/prices", "Цены", r === "#/prices"]);
   const roleSel = `<select data-act="role" class="rolesel">
       <option value="p" ${isProv() ? "selected" : ""}>Вход: обслуживающая организация</option>
       ${DB.clients.map(c => `<option value="${c.id}" ${!isProv() && ROLE.clientId === c.id ? "selected" : ""}>Вход: эксплуатант — ${h(c.name)}</option>`).join("")}
@@ -566,8 +693,8 @@ function pageDashboard() {
 
 function objectHead(o, tab) {
   const s = summary(o), c = client(o.clientId);
-  const tabs = [["", "Обзор"], ["checklist", "Чек-лист", s.no], ["schedule", "График работ", s.tasks.overdue], ["journal", "Журнал"],
-    ["issues", "Замечания и заявки", s.open]];
+  const tabs = [["", "Обзор"], ["checklist", "Чек-лист", s.no], ["schedule", "График работ", s.tasks.overdue], ["regulations", "Регламент ТО"], ["journal", "Журнал"],
+    ["issues", "Замечания и заявки", s.open], ["budget", "Бюджет"]];
   return `<div class="head"><div><h1>${h(o.name)}</h1><div class="muted">${h(o.address || "Адрес не указан")}${c ? " · " + h(c.name) : ""}</div></div>
     <div class="actions">${levelPill(s.level)}<a class="btn ghost sm" href="#/o/${o.id}/report">Отчёт для печати</a><a class="btn ghost sm" href="#/o/${o.id}/edit">Анкета</a></div></div>
     <nav class="tabs">${tabs.map(([t, n, cnt]) => `<a href="#/o/${o.id}${t ? "/" + t : ""}" class="${tab === t ? "on" : ""}">${n}${cnt ? `<span class="cnt">${cnt}</span>` : ""}</a>`).join("")}</nav>`;
@@ -588,7 +715,10 @@ function pageObject(o) {
     <div class="kpi red"><div class="v">${sm.tasks.overdue}</div><div class="l">просроченных работ</div></div>
     <div class="kpi yellow"><div class="v">${sm.tasks.soon}</div><div class="l">работ скоро по сроку</div></div>
     <div class="kpi"><div class="v">${sm.tasks.nodata}</div><div class="l">работ без данных</div></div>
-    <div class="kpi ${sm.crit ? "red" : ""}"><div class="v">${sm.open}</div><div class="l">открытых замечаний</div></div></div>
+    <div class="kpi ${sm.crit ? "red" : ""}"><div class="v">${sm.open}</div><div class="l">открытых замечаний</div></div>
+    ${(() => { const ro = regulations(o).reduce((a, r) => a + r.overdue, 0), b = budget(o);
+      return `<a class="kpi ${ro ? "red" : ""}" href="#/o/${o.id}/regulations" style="color:inherit;text-decoration:none"><div class="v">${ro}</div><div class="l">операций ТО по ГОСТ просрочено</div></a>
+      <a class="kpi" href="#/o/${o.id}/budget" style="color:inherit;text-decoration:none"><div class="v" style="font-size:1.2rem">${Math.round(b.yMin / 1000)}–${Math.round(b.yMax / 1000)} тыс. ₽</div><div class="l">бюджет ТО в год (ориентир)</div></a>`; })()}</div>
   <div class="grid two"><div>
     <div class="panel"><h2 style="margin-top:0">Ближайшие и просроченные работы</h2>
       ${shown.length ? `<table class="tbl">${shown.slice(0, 8).map(t => `<tr><td>${h(t.title)}<div class="small muted">${SIDE[t.side]} · ${periodLabel(t.period)}</div></td><td style="white-space:nowrap">${tPill(t.status)}<div class="small muted">${t.due ? ruDate(t.due) : ""}</div></td></tr>`).join("")}</table>
@@ -660,10 +790,10 @@ function pageSchedule(o) {
         <label class="check"><input type="checkbox" name="reset"> вернуть норматив</label><button class="btn sm">Сохранить</button></form></details>` : ""}</td>
     <td class="small">${ruDate(t.last)}</td>
     <td style="white-space:nowrap">${tPill(t.status)}<div class="small muted">${t.due ? ruDate(t.due) : ""} ${t.days === null ? "" : t.days < 0 ? `(${-t.days} дн. назад)` : `(через ${t.days} дн.)`}</div></td>
-    <td><form data-form="taskdone" data-id="${o.id}" data-code="${t.code}">
+    <td>${opsForTask(t.code, o.systems)[1].length ? `<a class="btn sm" href="#/o/${o.id}/act/${t.code}">Акт ТО по ГОСТ →</a><details><summary>быстрая отметка</summary>` : ""}<form data-form="taskdone" data-id="${o.id}" data-code="${t.code}">
       <div class="rowform"><input type="date" name="date" value="${today}" max="${today}" required><button class="btn sm">Выполнено</button></div>
       <details><summary>результат, примечание</summary><select name="result" style="margin-top:.4rem">${opts(RESULTS)}</select>
-        <input type="text" name="note" placeholder="Примечание" style="margin-top:.4rem"><input type="text" name="performer" placeholder="Исполнитель" style="margin-top:.4rem"></details></form></td>
+        <input type="text" name="note" placeholder="Примечание" style="margin-top:.4rem"><input type="text" name="performer" placeholder="Исполнитель" style="margin-top:.4rem"></details></form>${opsForTask(t.code, o.systems)[1].length ? "</details>" : ""}</td>
   </tr>`).join("") || `<tr><td colspan="6" class="empty">Работ нет — заполните системы в анкете.</td></tr>`}
   </tbody></table></div>`;
 }
@@ -683,7 +813,8 @@ function pageJournal(o) {
     </div><button class="btn">Добавить запись</button></form></div>
   <div class="tablewrap"><table class="tbl"><thead><tr><th>Дата</th><th>Работа</th><th>Система</th><th>Результат</th><th>Исполнитель</th></tr></thead><tbody>
   ${entries.map(j => `<tr class="row-${j.result === "Неисправно" ? "red" : j.result === "Выполнено с замечаниями" ? "yellow" : ""}">
-    <td style="white-space:nowrap">${ruDate(j.date)}</td><td>${h(j.type)}${j.task ? ' <span class="tag">по графику</span>' : ""}<div class="small">${h(j.desc)}</div></td>
+    <td style="white-space:nowrap">${ruDate(j.date)}</td><td>${h(j.type)}${j.task ? ' <span class="tag">по графику</span>' : ""}<div class="small">${h(j.desc)}</div>
+      ${(j.ops || []).length ? `<details><summary>операции (${j.ops.length}) · <a href="#/o/${o.id}/actview/${j.id}">акт</a></summary><ul class="small" style="margin:.3rem 0;padding-left:1.1rem">${j.ops.map(x => `<li>${pill({ok:"green", defect:"red", skip:"gray"}[x.status], OP_STATUS[x.status])} ${h((OP_TEXT[x.code] || [x.code])[0])}${x.note ? ` — <i>${h(x.note)}</i>` : ""}</li>`).join("")}</ul></details>` : ""}</td>
     <td class="small">${SYSTEMS[j.system] ? h(SYSTEMS[j.system].name) : "—"}</td><td class="small">${h(j.result)}</td>
     <td class="small">${h(j.performer)}<div class="muted">внёс: ${h(j.by || "")}</div></td></tr>`).join("") || `<tr><td colspan="5" class="empty">Записей нет</td></tr>`}
   </tbody></table></div>`;
@@ -783,10 +914,99 @@ function pageReport(o) {
   ${taskRows(o).map(t => `<tr><td>${h(t.title)}</td><td class="small">${h(t.ref)}</td><td class="small">${periodLabel(t.period)}</td><td>${ruDate(t.last)}</td><td>${t.due ? ruDate(t.due) : "—"}</td><td>${tPill(t.status)}</td></tr>`).join("")}</table>
   <h2>4. Соблюдение требований (чек-лист)</h2><table class="tbl"><tr><th>№</th><th>Требование</th><th>Ответ</th><th>Комментарий</th></tr>
   ${checklistRows(o).map(r => `<tr><td>${r.no}</td><td class="small">${h(r.text)}<div class="muted">${h(r.ref)}</div></td><td>${r.answer ? pill({yes:"green", no:"red", na:"gray"}[r.answer], ANSWERS[r.answer]) : '<span class="muted">—</span>'}</td><td class="small">${h(r.comment)}</td></tr>`).join("")}</table>
-  <h2>5. Открытые замечания</h2><table class="tbl"><tr><th>Замечание</th><th>Важность</th><th>Срок</th></tr>
+  <h2>5. Регламент ТО по ГОСТ</h2><table class="tbl"><tr><th>Система</th><th>Операций</th><th>Просрочено</th><th>Нет данных</th></tr>
+  ${regulations(o).map(r => `<tr><td>${h(r.name)}</td><td>${r.ops.length}</td><td>${r.overdue}</td><td>${r.nodata}</td></tr>`).join("") || '<tr><td colspan="4">—</td></tr>'}</table>
+  <h2>6. Ориентировочный бюджет на ТО систем ПЗ</h2>${budgetTable(budget(o))}<p class="small muted">Ориентир по рыночным ценам, без ремонта и замены оборудования.</p>
+  <h2>7. Открытые замечания</h2><table class="tbl"><tr><th>Замечание</th><th>Важность</th><th>Срок</th></tr>
   ${issues.map(i => `<tr><td>${h(i.title)}${i.desc ? `<div class="small muted">${h(i.desc)}</div>` : ""}</td><td>${SEV[i.severity]}</td><td>${ruDate(i.due)}</td></tr>`).join("") || '<tr><td colspan="3">Нет</td></tr>'}</table>
   <p class="small muted" style="margin-top:1.5rem">${h(NORMS_NOTE)}</p>
   <div class="sign"><div>Представитель обслуживающей организации</div><div>Представитель эксплуатанта</div></div></div>`;
+}
+
+// ---------- регламент ТО, акты, бюджет ----------
+const opPill = st => pill({overdue:"red", soon:"yellow", ok:"green", nodata:"gray", info:"gray"}[st],
+  {overdue:"Просрочено", soon:"Скоро", ok:"В норме", nodata:"Нет данных", info:"По ТД"}[st]);
+
+function pageAct(o, code) {
+  const t = TASKS_BY_CODE[code], [, ops] = opsForTask(code, o.systems);
+  if (!t || !ops.length) return objectHead(o, "schedule") + `<div class="panel">Для этой работы нет перечня операций.</div>`;
+  const rows = opsStatus(ops, opsLastDone(o)), today = iso(TODAY());
+  return objectHead(o, "schedule") + `<h2 style="margin-top:0">Акт ТО: ${h(t.title)}</h2>
+  <p class="muted small">Перечень операций по ГОСТ для этой системы. Система отметила к выполнению те, по которым подошёл или прошёл срок. «Неисправность» создаст замечание.</p>
+  <form data-form="act" data-id="${o.id}" data-code="${code}" class="panel"><div class="fields">
+    <div class="field"><label>Дата</label><input type="date" name="date" value="${today}" max="${today}" required></div>
+    <div class="field"><label>Исполнитель</label><input type="text" name="performer" placeholder="${h(userName())}"></div></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Операция</th><th>Периодичность</th><th>Последний раз</th><th>Результат</th></tr></thead><tbody>
+  ${rows.map(r => { const pre = ["overdue", "soon", "nodata"].includes(r.status) ? "ok" : "skip";
+    return `<tr class="row-${r.status === "overdue" ? "red" : r.status === "soon" ? "yellow" : ""}"><td>${h(r.text)}<div class="small muted">${h(r.ref)}</div></td>
+    <td class="small">${r.periodLabel}</td><td class="small">${ruDate(r.last)}<div>${opPill(r.status)}</div></td>
+    <td style="min-width:230px"><div class="opans">${[["ok", "Норма"], ["defect", "Неиспр."], ["skip", "Не вып."]].map(([k, v]) => `<label><input type="radio" name="st_${r.code}" value="${k}" ${pre === k ? "checked" : ""}><span>${v}</span></label>`).join("")}</div>
+    <input type="text" name="n_${r.code}" placeholder="Замечание / замер" style="margin-top:.3rem"></td></tr>`; }).join("")}
+  </tbody></table></div>
+  <div class="field"><label>Общий комментарий</label><textarea name="note"></textarea></div>
+  <button class="btn">Сохранить акт</button> <a class="btn ghost" href="#/o/${o.id}/schedule">Отмена</a></form>`;
+}
+
+function pageActView(o, jid) {
+  const j = (o.journal || []).find(x => x.id === jid);
+  if (!j) return `<div class="panel">Акт не найден.</div>`;
+  const c = client(o.clientId);
+  return `<div class="report"><div class="actions noprint" style="margin-bottom:1rem"><button class="btn" onclick="window.print()">Печать / сохранить PDF</button><a class="btn ghost" href="#/o/${o.id}/journal">← К журналу</a></div>
+  <h1>Акт технического обслуживания № ${j.id}</h1><p>от ${ruDate(j.date)} · ${h(TASKS_BY_CODE[j.task]?.title || j.type)}</p>
+  <dl class="kv"><dt>Объект</dt><dd>${h(o.name)}, ${h(o.address || "")}</dd><dt>Эксплуатант</dt><dd>${h(c?.name || "—")}</dd>
+  <dt>Система</dt><dd>${SYSTEMS[j.system] ? h(SYSTEMS[j.system].name) : "—"}</dd><dt>Исполнитель</dt><dd>${h(j.performer)}</dd><dt>Итог</dt><dd>${h(j.result)}</dd></dl>
+  <h2>Выполненные работы</h2><table class="tbl"><tr><th>№</th><th>Операция</th><th>Основание</th><th>Результат</th><th>Примечание</th></tr>
+  ${(j.ops || []).map((x, i) => `<tr><td>${i + 1}</td><td>${h((OP_TEXT[x.code] || [x.code])[0])}</td><td class="small">${h((OP_TEXT[x.code] || ["", ""])[1])}</td>
+    <td>${pill({ok:"green", defect:"red", skip:"gray"}[x.status], OP_STATUS[x.status])}</td><td class="small">${h(x.note || "")}</td></tr>`).join("") || `<tr><td colspan="5">${h(j.desc)}</td></tr>`}</table>
+  ${j.desc ? `<p class="small"><b>Комментарий:</b> ${h(j.desc)}</p>` : ""}
+  <div class="sign"><div>Представитель обслуживающей организации</div><div>Представитель эксплуатанта</div></div></div>`;
+}
+
+function pageRegs(o) {
+  const regs = regulations(o);
+  return objectHead(o, "regulations") + `<p class="muted small">Что конкретно должно выполняться с каждой системой по ГОСТ Р 59636…59643-2021 и ППР, когда это делали последний раз и когда срок. Отметки ставятся через «Акт ТО».</p>
+  ${regs.map(r => { const t = taskRows(o).find(x => MT.TASK_OPS[x.code] === r.system);
+    return `<div class="panel"><div class="head" style="margin-bottom:.4rem"><h2 style="margin:0">${h(r.name)}</h2><div class="actions">
+      ${r.overdue ? pill("red", "просрочено " + r.overdue) : ""}${r.nodata ? pill("gray", "нет данных " + r.nodata) : ""}${t ? `<a class="btn sm" href="#/o/${o.id}/act/${t.code}">Заполнить акт ТО</a>` : ""}</div></div>
+    <table class="tbl"><thead><tr><th>Операция</th><th>Периодичность</th><th>Последний раз</th><th>Срок</th><th>Статус</th></tr></thead>
+    ${r.ops.map(x => `<tr><td>${h(x.text)}<div class="small muted">${h(x.ref)}</div></td><td class="small">${x.periodLabel}</td><td class="small">${ruDate(x.last)}</td><td class="small">${x.due ? ruDate(x.due) : "—"}</td><td>${opPill(x.status)}</td></tr>`).join("")}</table></div>`; }).join("")
+    || `<div class="panel empty">Нет систем с регламентом ТО. Отметьте системы в анкете.</div>`}`;
+}
+
+function budgetTable(b) {
+  return `<div class="tablewrap"><table class="tbl"><thead><tr><th>Работа</th><th>Объём</th><th>Раз в год</th><th>За раз</th><th>В год</th></tr></thead><tbody>
+  ${b.lines.map(l => `<tr><td>${h(l.title)}${l.priceEst ? ' <span class="tag">цена — оценка</span>' : ""}</td>
+    <td class="small">${Math.round(l.qty)} ${h(l.unit)}${l.est ? '<div class="muted">≈ по площади — уточните в анкете</div>' : ""}</td>
+    <td class="small">${l.perYear < 1 ? `1 раз в ${Math.round(1 / l.perYear)} лет` : +l.perYear.toFixed(1)}</td>
+    <td class="small" style="white-space:nowrap">${rub(l.eMin)} – ${rub(l.eMax)}</td><td style="white-space:nowrap"><b>${rub(l.yMin)} – ${rub(l.yMax)}</b></td></tr>`).join("")
+    || '<tr><td colspan="5" class="empty">Нет работ для оценки — заполните системы в анкете</td></tr>'}</tbody>
+  <tfoot><tr><td colspan="4"><b>Итого в год</b></td><td style="white-space:nowrap"><b>${rub(b.yMin)} – ${rub(b.yMax)}</b></td></tr></tfoot></table></div>`;
+}
+
+function pageBudget(o) {
+  const b = budget(o);
+  return objectHead(o, "budget") + `<div class="grid k" style="margin-bottom:1rem">
+    <div class="kpi"><div class="v" style="font-size:1.35rem">${rub(b.yMin)} – ${rub(b.yMax)}</div><div class="l">ориентировочно в год</div></div>
+    <div class="kpi"><div class="v" style="font-size:1.35rem">≈ ${rub((b.yMin + b.yMax) / 2)}</div><div class="l">середина диапазона в год</div></div>
+    <div class="kpi"><div class="v" style="font-size:1.35rem">${rub(b.yMin / 12)} – ${rub(b.yMax / 12)}</div><div class="l">в среднем в месяц</div></div>
+    <div class="kpi"><div class="v" style="font-size:1.35rem">× ${+b.coef.toFixed(2)}</div><div class="l">поправочный коэффициент</div></div></div>
+  ${budgetTable(b)}
+  ${b.skipped.length ? `<div class="panel small"><b>Не входит в оценку:</b><ul style="margin:.4rem 0 0;padding-left:1.1rem">${b.skipped.map(([t, r]) => `<li>${h(t)} — <span class="muted">${h(r)}</span></li>`).join("")}</ul></div>` : ""}
+  <p class="small muted">${h(MT.PRICES_NOTE)} Периодичность берётся из графика работ объекта. ${isProv() ? '<a href="#/prices">Изменить цены</a>' : ""}</p>`;
+}
+
+function pagePrices() {
+  if (!isProv()) return `<div class="panel">Раздел доступен обслуживающей организации.</div>`;
+  return `<h1>Цены для расчёта бюджета</h1><p class="muted">${h(MT.PRICES_NOTE)}</p>
+  <form data-form="prices" class="panel"><div class="field" style="max-width:320px"><label>Общий коэффициент (регион, НДС, ваша наценка)</label>
+    <input type="number" step="0.01" name="coef" value="${DB.prices.coef}"></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>Работа</th><th>Расчёт</th><th>Цена от, ₽</th><th>Цена до, ₽</th></tr></thead>
+  ${priceItems().map(it => `<tr><td><b>${h(it.title)}</b>${it.est ? ' <span class="tag">оценка</span>' : ""}</td>
+    ${["unit", "fixed"].includes(it.kind) ? `<td class="small">${it.kind === "unit" ? `за единицу (${h(it.unit)})` : "за выполнение"}${it.min_charge ? `<div class="muted">мин. ${it.min_charge[0]}–${it.min_charge[1]} ₽ за выезд</div>` : ""}</td>
+      <td><input type="number" step="any" name="min_${it.code}" value="${it.min}" style="width:110px"></td><td><input type="number" step="any" name="max_${it.code}" value="${it.max}" style="width:110px"></td>`
+    : `<td class="small">${it.kind === "tier" ? `абонентская плата по ступеням (${h(it.unit)}): ${it.tiers.map(t => `до ${t[0]} — ${t[1]}–${t[2]} ₽`).join("; ")}` : `до ${it.upto} м² — ${it.base[0]}–${it.base[1]} ₽, далее +${it.extra[0]}–${it.extra[1]} ₽ за ${it.step} м²`}</td>
+      <td colspan="2"><label class="small">Множитель</label><input type="number" step="0.01" name="mult_${it.code}" value="${it.mult}" style="width:110px"></td>`}</tr>`).join("")}
+  </table></div><button class="btn">Сохранить цены</button></form>`;
 }
 
 // ---------- роутер ----------
@@ -798,14 +1018,17 @@ function route() {
   else if (parts[0] === "issues") html = pageAllIssues();
   else if (parts[0] === "clients") html = pageClients();
   else if (parts[0] === "data") html = pageData();
+  else if (parts[0] === "prices") html = pagePrices();
   else if (parts[0] === "new") html = isProv() ? pageForm(null) : `<div class="panel">Новые объекты заводит обслуживающая организация.</div>`;
   else if (parts[0] === "o") {
     const o = obj(+parts[1]);
     if (!o || (!isProv() && o.clientId !== ROLE.clientId)) html = `<div class="panel">Объект не найден или нет доступа. <a href="#/">К списку</a></div>`;
+    else if (parts[2] === "act") html = pageAct(o, parts[3]);
+    else if (parts[2] === "actview") html = pageActView(o, +parts[3]);
     else html = ({"": pageObject, checklist: pageChecklist, schedule: pageSchedule, journal: pageJournal, issues: pageIssues,
-                  edit: pageForm, report: pageReport}[parts[2] || ""] || pageObject)(o);
+                  edit: pageForm, report: pageReport, regulations: pageRegs, budget: pageBudget}[parts[2] || ""] || pageObject)(o);
   } else html = pageDashboard();
-  const isReport = parts[2] === "report";
+  const isReport = parts[2] === "report" || parts[2] === "actview";
   document.getElementById("app").innerHTML = (isReport ? "" : header()) +
     `<main class="wrap">${flashHtml()}${html}</main>`;
   document.querySelectorAll(".sys input[data-sys]").forEach(cb => cb.addEventListener("change", () => cb.closest(".sys").classList.toggle("on", cb.checked)));
@@ -885,6 +1108,33 @@ const FORMS = {
     i.status = d.get("status"); const r = (d.get("resolution") || "").trim(); if (r) i.resolution = r;
     i.resolved = i.status === "resolved" ? iso(TODAY()) : null;
     save(); flash("Статус обновлён"); route();
+  },
+  act(f, d) {
+    const o = obj(+f.dataset.id), code = f.dataset.code, t = TASKS_BY_CODE[code], [, ops] = opsForTask(code, o.systems), date = d.get("date");
+    if (!date || date > iso(TODAY())) { flash("Дата не может быть в будущем", "error"); return route(); }
+    const marks = ops.map(([c, text]) => ({code: c, text, status: d.get("st_" + c) || "skip", note: (d.get("n_" + c) || "").trim()}));
+    const done = marks.filter(m => m.status !== "skip"), defects = marks.filter(m => m.status === "defect");
+    if (!done.length) { flash("Отметьте хотя бы одну выполненную операцию", "error"); return route(); }
+    const note = (d.get("note") || "").trim(), jid = nid();
+    o.journal.push({id: jid, date, task: code, system: t.system || "", type: "Техническое обслуживание",
+      desc: `${t.title}: выполнено операций — ${done.length}` + (defects.length ? `, неисправностей — ${defects.length}` : "") + (note ? ". " + note : ""),
+      result: defects.length ? RESULTS[1] : RESULTS[0], performer: (d.get("performer") || "").trim() || userName(), by: userName(),
+      ops: marks.map(({code, status, note}) => ({code, status, note}))});
+    defects.forEach(m => addIssue(o, `${SYSTEMS[t.system]?.name || ""}: ${m.text.slice(0, 150)}`, m.note, "medium"));
+    done.forEach(m => { if (MT.OP_TASK[m.code]) markDone(o, MT.OP_TASK[m.code], date); });
+    markDone(o, code, date); save();
+    flash(`Акт ТО сохранён: ${done.length} операций` + (defects.length ? `, замечаний: ${defects.length}` : ""));
+    go(`#/o/${o.id}/actview/${jid}`);
+  },
+  prices(f, d) {
+    const items = {};
+    for (const it of MT.PRICES) {
+      const ov = {};
+      for (const k of ["min", "max", "mult"]) { const v = parseFloat(String(d.get(`${k}_${it.code}`) || "").replace(",", ".")); if (!isNaN(v)) ov[k] = v; }
+      if (Object.keys(ov).length) items[it.code] = ov;
+    }
+    DB.prices = {coef: parseFloat(String(d.get("coef") || "1").replace(",", ".")) || 1, items};
+    save(); flash("Цены сохранены — бюджеты объектов пересчитаны"); route();
   },
   client(f, d) {
     DB.clients.push({id: nid(), name: d.get("name").trim(), inn: d.get("inn"), contact: d.get("contact"), phone: d.get("phone")});
